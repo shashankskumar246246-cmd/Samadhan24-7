@@ -1,0 +1,3711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Societal Innovation Portal</title>
+
+    <link rel="stylesheet" href="my1.css">
+
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.6.0/fonts/remixicon.css" rel="stylesheet">
+    <!-- Leaflet Fallback Provider (Kept active as safe fallback) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Environment & Configuration -->
+    <script src="env.js"></script>
+</head>
+
+<body>
+
+    <!-- ================= SIDEBAR ================= -->
+
+    <aside class="sidebar" id="appSidebar">
+
+        <div class="logo">
+            <img class="logo-icon" src="img_24.png" alt="Samadhan 24/7">
+            <div class="logo-text">
+                <h2>Samadhan<span style="color: #bbf2fc;">24/7</span></h2>
+                <small>Jharkhand Innovation Portal</small>
+            </div>
+        </div>
+
+        <div class="sidebar-toggle-row">
+            <button type="button" class="sidebar-hamburger-btn" id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" aria-label="Toggle Navigation Sidebar" title="Collapse/Expand Sidebar">
+                <i class="ri-menu-line"></i>
+            </button>
+        </div>
+
+        <nav>
+
+            <a href="#" class="nav-link active" onclick="showPage('dashboard', this)" title="Dashboard">
+                <i class="ri-dashboard-line"></i>
+                <span class="nav-label">Dashboard</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('submit', this)" title="Submit Problem">
+                <i class="ri-add-circle-line"></i>
+                <span class="nav-label">Submit Problem</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('problems', this)" title="Problems">
+                <i class="ri-file-list-3-line"></i>
+                <span class="nav-label">Problems</span>
+            </a>
+
+            <a href="#" class="nav-link" id="navSmartMatching" onclick="showPage('matching', this)" title="Smart Matching">
+                <i class="ri-cpu-line"></i>
+                <span class="nav-label">Smart Matching</span>
+                <span class="badge-pulse">AI</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('universities', this)" title="Universities">
+                <i class="ri-school-line"></i>
+                <span class="nav-label">Universities</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('industry', this)" title="Industry">
+                <i class="ri-building-line"></i>
+                <span class="nav-label">Industry</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('projects', this)" title="Projects">
+                <i class="ri-projector-line"></i>
+                <span class="nav-label">Projects</span>
+            </a>
+
+            <a href="#" class="nav-link" onclick="showPage('analytics', this)" title="Analytics">
+                <i class="ri-bar-chart-box-line"></i>
+                <span class="nav-label">Analytics</span>
+            </a>
+
+        </nav>
+
+        <div class="sidebar-bottom">
+
+            <a href="#" class="nav-link" id="sidebarNotifLink" onclick="showPage('notifications', this)" title="Notifications">
+                <i class="ri-notification-3-line"></i>
+                <span class="nav-label">Notifications</span>
+                <span class="notification-count" id="sidebarNotificationBadge">3</span>
+            </a>
+
+            <a href="#" class="nav-link" id="sidebarSettingsLink" onclick="showPage('settings', this)" title="Settings">
+                <i class="ri-settings-3-line"></i>
+                <span class="nav-label">Settings</span>
+            </a>
+
+        </div>
+
+    </aside>
+
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main">
+
+        <!-- TOPBAR -->
+
+        <header class="topbar">
+
+            <div class="mobile-menu" onclick="toggleSidebar()">
+                <i class="ri-menu-line"></i>
+            </div>
+
+            <div class="search-box">
+
+                <i class="ri-search-line"></i>
+
+                <input type="text" id="globalSearch" placeholder="Search problems, projects..."
+                    onkeyup="globalSearch()">
+
+            </div>
+
+            <div class="top-actions">
+
+                <div class="notification-dropdown-wrapper" id="notifDropdownWrapper">
+                    <button class="icon-btn" id="upperNotificationBtn" onclick="toggleNotificationDropdown(event)" aria-label="Notifications" title="Notifications">
+                        <i class="ri-notification-3-line"></i>
+                        <span class="notification-count" id="upperNotificationBadge">3</span>
+                    </button>
+
+                    <div class="notification-dropdown" id="notificationDropdown">
+                        <div class="notif-dropdown-header">
+                            <div class="notif-header-info">
+                                <h3>Notifications</h3>
+                                <span class="notif-pill" id="notifDropdownUnreadPill">3 New</span>
+                            </div>
+                            <button type="button" class="notif-text-action-btn" onclick="markAllNotificationsRead(event)">
+                                <i class="ri-check-double-line"></i> Mark all read
+                            </button>
+                        </div>
+                        <div class="notif-dropdown-body" id="notifDropdownList">
+                            <!-- Populated dynamically by JS -->
+                        </div>
+                        <div class="notif-dropdown-footer">
+                            <button type="button" class="notif-footer-link clear-btn" onclick="clearAllNotifications(event)">
+                                <i class="ri-delete-bin-line"></i> Clear read
+                            </button>
+                            <button type="button" class="notif-footer-link view-btn" onclick="goToNotificationsPage(event)">
+                                View All Notifications →
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="profile" onclick="showPage('settings', document.getElementById('sidebarSettingsLink'))"
+                    style="cursor: pointer;" title="Open Admin Settings">
+
+                    <div class="avatar" id="topbarAvatar">
+                        SK
+                    </div>
+
+                    <div>
+                        <strong id="topbarUserName">Shashank Kumar</strong>
+                        <small id="topbarUserRole">Administrator</small>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+        <!-- ================= DASHBOARD ================= -->
+
+        <section id="dashboard" class="page active-page">
+
+            <div class="page-header">
+
+                <div>
+                    <p class="eyebrow">WELCOME</p>
+
+                    <h1>Societal Innovation Dashboard</h1>
+
+                    <p>
+                        Connect citizens, universities, industries and government
+                        to solve real-world problems.
+                    </p>
+                </div>
+
+                <button class="primary-btn" onclick="showPage('submit')">
+                    <i class="ri-add-line"></i>
+                    Submit Problem
+                </button>
+
+            </div>
+
+
+            <!-- STAT CARDS -->
+
+            <div class="stats-grid">
+
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="ri-file-warning-line"></i>
+                    </div>
+
+                    <div>
+                        <span>Total Problems</span>
+                        <h2 id="totalProblems">2,540</h2>
+                        <small class="positive">
+                            ↑ 12.5% this month
+                        </small>
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="ri-checkbox-circle-line"></i>
+                    </div>
+
+                    <div>
+                        <span>Problems Solved</span>
+                        <h2 id="solvedProblems">1,120</h2>
+                        <small class="positive">
+                            ↑ 8.2% this month
+                        </small>
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="ri-loader-4-line"></i>
+                    </div>
+
+                    <div>
+                        <span>In Progress</span>
+                        <h2>850</h2>
+                        <small>
+                            33.5% of total
+                        </small>
+                    </div>
+                </div>
+
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="ri-team-line"></i>
+                    </div>
+
+                    <div>
+                        <span>Active Projects</span>
+                        <h2>186</h2>
+                        <small class="positive">
+                            ↑ 15 new projects
+                        </small>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- SMART MATCHING QUICK PREVIEW BANNER -->
+            <div class="panel"
+                style="margin-bottom: 24px; background: linear-gradient(135deg, rgba(37, 99, 235, 0.06), rgba(124, 58, 237, 0.06)); border: 1px solid rgba(37, 99, 235, 0.25); border-radius: 12px; padding: 20px;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+                    <div style="display: flex; align-items: center; gap: 14px;">
+                        <div
+                            style="width: 50px; height: 50px; border-radius: 12px; background: linear-gradient(135deg, #0076A8, #00A3C4); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; flex-shrink: 0; box-shadow: 0 4px 12px rgba(0, 118, 168, 0.3);">
+                            <i class="ri-cpu-line"></i>
+                        </div>
+                        <div>
+                            <h3
+                                style="margin-bottom: 3px; display: flex; align-items: center; gap: 8px; font-size: 1.15rem;">
+                                Automatic University + Industry Matching Engine
+                                <span class="badge-pulse">ACTIVE AI</span>
+                            </h3>
+                            <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 750px;">
+                                Automated explainable partner matching for every community problem across Jharkhand's 24
+                                Universities and 25 Industry Sectors.
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <button class="secondary-btn" onclick="showPage('matching')">
+                            <i class="ri-search-eye-line"></i> View Recommendations
+                        </button>
+                        <button class="primary-btn" onclick="showPage('matching')">
+                            <i class="ri-sparkling-fill"></i> Open Matching Hub →
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FRAUD & DUPLICATE INTEGRITY DASHBOARD OVERVIEW (Requirement 15) -->
+            <div class="panel" id="integrityOverviewPanel"
+                style="margin-bottom: 24px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(37, 99, 235, 0.05)); border: 1px solid rgba(16, 185, 129, 0.25); border-radius: 12px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 44px; height: 44px; border-radius: 10px; background: linear-gradient(135deg, #10b981, #059669); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0;">
+                            <i class="ri-shield-check-line"></i>
+                        </div>
+                        <div>
+                            <h3 style="margin: 0; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;">
+                                Citizen Report Integrity &amp; Verification Overview
+                                <span class="badge-tag" style="background: rgba(16, 185, 129, 0.15); color: #059669; font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; font-weight: 600;">ACTIVE MONITOR</span>
+                            </h3>
+                            <p style="color: var(--muted); font-size: 0.84rem; margin-top: 2px;">
+                                Automated GPS-vs-Reported location validation, Haversine fraud scoring &amp; multi-signal duplicate prevention.
+                            </p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px;">
+                        <button type="button" id="btnReviewSuspicious" class="secondary-btn" onclick="openSuspiciousReviewModal()" style="font-size: 0.82rem; padding: 6px 12px;">
+                            <i class="ri-alert-line" style="color: #f59e0b;"></i> Review Suspicious
+                        </button>
+                        <button type="button" id="btnReviewDuplicates" class="secondary-btn" onclick="openDuplicatesReviewModal()" style="font-size: 0.82rem; padding: 6px 12px;">
+                            <i class="ri-file-copy-2-line" style="color: #b45309;"></i> Review Duplicates
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 5 Metrics Cards -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px;">
+                    <div style="background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; padding: 12px 14px; text-align: center;">
+                        <span style="color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 600; display: block;">Total Reports</span>
+                        <h2 id="dashStatTotalReports" style="margin: 4px 0 0 0; font-size: 1.5rem; color: var(--primary);">--</h2>
+                        <small style="color: var(--muted); font-size: 0.72rem;">All Submissions</small>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; padding: 12px 14px; text-align: center;">
+                        <span style="color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 600; display: block;">Verified</span>
+                        <h2 id="dashStatVerifiedReports" style="margin: 4px 0 0 0; font-size: 1.5rem; color: #10b981;">--</h2>
+                        <small style="color: #10b981; font-size: 0.72rem;">✓ Location Confirmed</small>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; padding: 12px 14px; text-align: center;">
+                        <span style="color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 600; display: block;">Location Mismatch</span>
+                        <h2 id="dashStatMismatchReports" style="margin: 4px 0 0 0; font-size: 1.5rem; color: #ef4444;">--</h2>
+                        <small style="color: #ef4444; font-size: 0.72rem;">⚠ Distance &gt; 50km</small>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; padding: 12px 14px; text-align: center;">
+                        <span style="color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 600; display: block;">Duplicates Flagged</span>
+                        <h2 id="dashStatDuplicateReports" style="margin: 4px 0 0 0; font-size: 1.5rem; color: #f59e0b;">--</h2>
+                        <small style="color: #f59e0b; font-size: 0.72rem;">⚠ High Similarity</small>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); border: 1px solid var(--border-color, #e2e8f0); border-radius: 10px; padding: 12px 14px; text-align: center;">
+                        <span style="color: var(--muted); font-size: 0.78rem; text-transform: uppercase; font-weight: 600; display: block;">Needs Verification</span>
+                        <h2 id="dashStatUnderVerification" style="margin: 4px 0 0 0; font-size: 1.5rem; color: #6366f1;">--</h2>
+                        <small style="color: #6366f1; font-size: 0.72rem;">Pending Review</small>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- DASHBOARD CONTENT -->
+
+            <div class="dashboard-grid">
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h3>Problems by Domain</h3>
+                            <p>Current distribution across sectors</p>
+                        </div>
+
+                        <select id="dashboardDistrictFilter" onchange="updateDomainStatistics(this.value)">
+                            <option value="All Districts">All Districts</option>
+                            <option value="Bokaro">Bokaro</option>
+                            <option value="Chatra">Chatra</option>
+                            <option value="Deoghar">Deoghar</option>
+                            <option value="Dhanbad">Dhanbad</option>
+                            <option value="Dumka">Dumka</option>
+                            <option value="East Singhbhum">East Singhbhum</option>
+                            <option value="Garhwa">Garhwa</option>
+                            <option value="Giridih">Giridih</option>
+                            <option value="Godda">Godda</option>
+                            <option value="Gumla">Gumla</option>
+                            <option value="Hazaribagh">Hazaribagh</option>
+                            <option value="Jamtara">Jamtara</option>
+                            <option value="Khunti">Khunti</option>
+                            <option value="Koderma">Koderma</option>
+                            <option value="Latehar">Latehar</option>
+                            <option value="Lohardaga">Lohardaga</option>
+                            <option value="Pakur">Pakur</option>
+                            <option value="Palamu">Palamu</option>
+                            <option value="Ramgarh">Ramgarh</option>
+                            <option value="Ranchi">Ranchi</option>
+                            <option value="Sahibganj">Sahibganj</option>
+                            <option value="Sarikela Kharsawan">Sarikela Kharsawan</option>
+                            <option value="Simdega">Simdega</option>
+                            <option value="West Singhbhum">West Singhbhum</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="domain-chart" id="dashboardDomainChart">
+
+                        <div class="chart-row">
+
+                            <div>
+                                <span>Education</span>
+                                <strong id="domainCountEducation">--</strong>
+                            </div>
+
+                            <div class="bar">
+                                <div id="domainBarEducation" style="width:0%"></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-row">
+
+                            <div>
+                                <span>Healthcare</span>
+                                <strong id="domainCountHealthcare">--</strong>
+                            </div>
+
+                            <div class="bar">
+                                <div id="domainBarHealthcare" style="width:0%"></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-row">
+
+                            <div>
+                                <span>Agriculture</span>
+                                <strong id="domainCountAgriculture">--</strong>
+                            </div>
+
+                            <div class="bar">
+                                <div id="domainBarAgriculture" style="width:0%"></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-row">
+
+                            <div>
+                                <span>Water</span>
+                                <strong id="domainCountWater">--</strong>
+                            </div>
+
+                            <div class="bar">
+                                <div id="domainBarWater" style="width:0%"></div>
+                            </div>
+
+                        </div>
+
+
+                        <div class="chart-row">
+
+                            <div>
+                                <span>Environment</span>
+                                <strong id="domainCountEnvironment">--</strong>
+                            </div>
+
+                            <div class="bar">
+                                <div id="domainBarEnvironment" style="width:0%"></div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- RECENT PROBLEMS -->
+
+                <div class="panel">
+
+                    <div class="panel-header">
+
+                        <div>
+                            <h3>Recent Problems</h3>
+                            <p>Latest community submissions</p>
+                        </div>
+
+                        <button class="text-btn" onclick="showPage('problems')">
+                            View All
+                        </button>
+
+                    </div>
+
+
+                    <div class="problem-list">
+
+                        <div class="problem-item">
+
+                            <div class="problem-icon water">
+                                💧
+                            </div>
+
+                            <div class="problem-info">
+
+                                <strong>
+                                    Drinking Water Shortage
+                                </strong>
+
+                                <span>
+                                    Gumla District • 2 hours ago
+                                </span>
+
+                            </div>
+
+                            <span class="badge high">
+                                High
+                            </span>
+
+                        </div>
+
+
+                        <div class="problem-item">
+
+                            <div class="problem-icon education">
+                                🎓
+                            </div>
+
+                            <div class="problem-info">
+
+                                <strong>
+                                    Teacher Shortage
+                                </strong>
+
+                                <span>
+                                    Ranchi District • 5 hours ago
+                                </span>
+
+                            </div>
+
+                            <span class="badge medium">
+                                Medium
+                            </span>
+
+                        </div>
+
+
+                        <div class="problem-item">
+
+                            <div class="problem-icon agriculture">
+                                🌾
+                            </div>
+
+                            <div class="problem-info">
+
+                                <strong>
+                                    Crop Irrigation Issue
+                                </strong>
+
+                                <span>
+                                    Deoghar District • 1 day ago
+                                </span>
+
+                            </div>
+
+                            <span class="badge high">
+                                High
+                            </span>
+
+                        </div>
+
+
+                        <div class="problem-item">
+
+                            <div class="problem-icon environment">
+                                🌳
+                            </div>
+
+                            <div class="problem-info">
+
+                                <strong>
+                                    Waste Management
+                                </strong>
+
+                                <span>
+                                    Dhanbad District • 1 day ago
+                                </span>
+
+                            </div>
+
+                            <span class="badge low">
+                                Low
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ECOSYSTEM -->
+
+            <div class="ecosystem">
+
+                <div class="ecosystem-card citizen">
+                    <div class="eco-icon">
+                        👨‍👩‍👧
+                    </div>
+
+                    <div>
+                        <h3>Citizens</h3>
+                        <p>Identify & report problems</p>
+                    </div>
+                </div>
+
+
+                <div class="arrow">
+                    →
+                </div>
+
+
+                <div class="ecosystem-card university">
+                    <div class="eco-icon">
+                        🎓
+                    </div>
+
+                    <div>
+                        <h3>Universities</h3>
+                        <p>Research & develop solutions</p>
+                    </div>
+                </div>
+
+
+                <div class="arrow">
+                    →
+                </div>
+
+
+                <div class="ecosystem-card industry">
+                    <div class="eco-icon">
+                        🏢
+                    </div>
+
+                    <div>
+                        <h3>Industry</h3>
+                        <p>Funding & technology</p>
+                    </div>
+                </div>
+
+
+                <div class="arrow">
+                    →
+                </div>
+
+
+                <div class="ecosystem-card government">
+                    <div class="eco-icon">
+                        🏛️
+                    </div>
+
+                    <div>
+                        <h3>Government</h3>
+                        <p>Implementation & impact</p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SUBMIT PROBLEM ================= -->
+
+        <section id="submit" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <p class="eyebrow">CITIZEN ENGAGEMENT</p>
+                    <h1>Submit a Societal Problem</h1>
+                    <p>
+                        Tell us about a problem in your community.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="form-container">
+
+                <form id="problemForm">
+
+                    <div class="form-section">
+
+                        <h3>
+                            <i class="ri-information-line"></i>
+                            Problem Information
+                        </h3>
+
+                        <div class="form-grid">
+
+                            <div class="form-group full">
+
+                                <label>
+                                    Problem Title *
+                                </label>
+
+                                <input type="text" id="problemTitle"
+                                    placeholder="Example: Village has no clean drinking water" required
+                                    autocomplete="off">
+
+                            </div>
+
+                            <div class="form-group full">
+
+                                <label>
+                                    Problem Description *
+                                </label>
+
+                                <textarea id="description" rows="5"
+                                    placeholder="Explain the problem in detail (e.g. Villagers are facing severe shortage of drinking water during summer months)..."
+                                    required></textarea>
+
+                            </div>
+
+                            <!-- AI AUTO CATEGORY DETECTION FEEDBACK CARD -->
+                            <div class="form-group full">
+                                <div class="ai-category-detector" id="aiCategoryBox" style="display: none;">
+                                    <div class="ai-cat-header">
+                                        <div class="ai-cat-title-wrap">
+                                            <span class="ai-pulse-dot"></span>
+                                            <span class="ai-badge-label"><i class="ri-sparkling-fill"></i> AI Category
+                                                Detection</span>
+                                        </div>
+                                        <div class="ai-confidence-pill" id="aiConfidenceBadge">
+                                            <span id="aiConfidenceText">Confidence: --%</span>
+                                        </div>
+                                    </div>
+                                    <div class="ai-cat-body">
+                                        <div class="ai-cat-result-row">
+                                            <span class="ai-result-label">Detected Category:</span>
+                                            <strong class="ai-detected-name" id="aiDetectedCatName">--</strong>
+                                            <span class="ai-status-tag" id="aiCatStatusTag">✓ Auto-filled</span>
+                                        </div>
+                                        <div class="ai-confidence-bar-bg">
+                                            <div class="ai-confidence-bar-fill" id="aiConfidenceBar" style="width: 0%;">
+                                            </div>
+                                        </div>
+                                        <!-- Detected Keywords -->
+                                        <div class="ai-keywords-wrap" id="aiKeywordsWrap" style="display: none;">
+                                            <span class="ai-keywords-label"><i class="ri-price-tag-3-line"></i> Detected
+                                                Keywords:</span>
+                                            <div class="ai-keywords-list" id="aiKeywordsList"></div>
+                                        </div>
+                                        <!-- Low Confidence Suggestions (Feature 12) -->
+                                        <div class="ai-suggestions-wrap" id="aiSuggestionsWrap" style="display: none;">
+                                            <p class="ai-suggestions-notice"><i class="ri-alert-line"></i> AI is not
+                                                fully confident about this category. Suggested:</p>
+                                            <div class="ai-suggestions-list" id="aiSuggestionsList"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group full">
+
+                                <label>
+                                    Category * <span class="override-indicator" id="categoryOverrideHint"
+                                        style="display: none; font-size: 0.82rem; color: #10b981; font-weight: 500;">(✓
+                                        User Confirmed / Selected)</span>
+                                </label>
+
+                                <select id="category" required>
+
+                                    <option value="">
+                                        Select Category
+                                    </option>
+
+                                    <option value="Water Management">
+                                        💧 Water Management
+                                    </option>
+
+                                    <option value="Education">
+                                        🎓 Education
+                                    </option>
+
+                                    <option value="Healthcare">
+                                        🏥 Healthcare
+                                    </option>
+
+                                    <option value="Agriculture">
+                                        🌾 Agriculture
+                                    </option>
+
+                                    <option value="Sanitation">
+                                        🧹 Sanitation
+                                    </option>
+
+                                    <option value="Environment">
+                                        🌳 Environment
+                                    </option>
+
+                                    <option value="Energy">
+                                        ⚡ Energy
+                                    </option>
+
+                                    <option value="Urban Infrastructure">
+                                        🏙️ Urban Infrastructure
+                                    </option>
+
+                                    <option value="Rural Livelihoods">
+                                        👨‍🌾 Rural Livelihoods
+                                    </option>
+
+                                    <option value="Accessibility">
+                                        ♿ Accessibility
+                                    </option>
+
+                                    <option value="Public Services">
+                                        🏛️ Public Services
+                                    </option>
+
+                                    <option value="Disaster Management">
+                                        🚨 Disaster Management
+                                    </option>
+
+                                    <option value="Other">
+                                        💡 Other
+                                    </option>
+
+                                    <!-- Legacy value aliases for backwards compatibility -->
+                                    <option value="Water" style="display:none;">Water</option>
+                                    <option value="Urban Development" style="display:none;">Urban Development</option>
+                                    <option value="Rural Livelihood" style="display:none;">Rural Livelihood</option>
+                                    <option value="Public Administration" style="display:none;">Public Administration
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-section">
+
+                        <div class="section-title-wrap">
+                            <h3>
+                                <i class="ri-map-pin-2-line"></i>
+                                Smart Location &amp; Geo-Detection
+                            </h3>
+                        </div>
+
+                        <!-- GPS Diagnostic Status (Step 10 Debugging) -->
+                        <div class="gps-diagnostic-bar" id="gpsDiagBar" style="display: flex; gap: 16px; flex-wrap: wrap; padding: 6px 12px; margin-top: 8px; margin-bottom: 8px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 0.8rem; color: #475569;">
+                            <span><strong>GPS Status:</strong> <span id="diagGpsStatus">Checking...</span></span>
+                            <span><strong>Secure Context:</strong> <span id="diagSecureContext">--</span></span>
+                            <span><strong>Geolocation Available:</strong> <span id="diagGeoAvailable">--</span></span>
+                        </div>
+
+                        <!-- Privacy Notice -->
+                        <div class="loc-privacy-notice" id="locPrivacyNotice">
+                            <i class="ri-shield-check-line"></i>
+                            <span>Your location is used only to identify the problem location and update this form. Location access requires your permission.</span>
+                        </div>
+
+                        <div class="location-action-bar">
+                            <div class="location-btn-group">
+                                <button type="button" class="location-btn primary-geo-btn" id="btnDetectLocation"
+                                    onclick="useCurrentLocation()">
+                                    <i class="ri-crosshair-2-line"></i>
+                                    <span>📍 Use My Current Location</span>
+                                </button>
+                                <button type="button" class="location-btn copy-geo-btn" id="btnCopyGpsToProblem"
+                                    onclick="copyCurrentGpsToProblemLocation()" style="display: none;" title="Copy current GPS coordinates to problem location">
+                                    <i class="ri-map-pin-add-line"></i>
+                                    <span>🎯 Use Current Location as Problem Location</span>
+                                </button>
+                                <button type="button" class="location-btn live-track-btn" id="btnLiveLocation"
+                                    onclick="toggleLiveLocation()">
+                                    <i class="ri-radar-line"></i>
+                                    <span id="btnLiveLocationText">Start Live Location</span>
+                                </button>
+                            </div>
+
+                            <div class="location-pills-row">
+                                <div class="coordinates-pill" id="coordinatesPill">
+                                    <i class="ri-navigation-line"></i>
+                                    <span id="coordinatesText">GPS Coordinates: Not detected yet (Click "Use My Current Location" or click on map)</span>
+                                </div>
+                                <span class="gps-accuracy-badge" id="gpsAccuracyBadge" style="display: none;">
+                                    <i class="ri-focus-3-line"></i>
+                                    <span id="accuracyValText">GPS Accuracy: -- m</span>
+                                </span>
+                                <span class="loc-telemetry-pill" id="locTelemetryPill" style="display: none;">
+                                    <i class="ri-time-line"></i>
+                                    <span id="locTelemetryText">Source: --</span>
+                                </span>
+                            </div>
+                        </div>
+
+                        <p id="locationStatus" class="location-status-msg"></p>
+
+                        <div class="form-grid location-grid" style="margin-top: 1rem;">
+
+                            <div class="form-group">
+                                <label>
+                                    State *
+                                </label>
+                                <input type="text" id="state" value="Jharkhand" placeholder="State" required>
+                            </div>
+
+                            <div class="form-group">
+                                <label>
+                                    District * <span class="auto-detected-badge" id="districtAutoTag"
+                                        style="display: none;">✓ Auto-detected</span>
+                                </label>
+
+                                <select id="district" required>
+
+                                    <option value="">
+                                        Select District
+                                    </option>
+
+                                    <option>Bokaro</option>
+                                    <option>Chatra</option>
+                                    <option>Deoghar</option>
+                                    <option>Dhanbad</option>
+                                    <option>Dumka</option>
+                                    <option>East Singhbhum</option>
+                                    <option>Garhwa</option>
+                                    <option>Giridih</option>
+                                    <option>Godda</option>
+                                    <option>Gumla</option>
+                                    <option>Hazaribagh</option>
+                                    <option>Jamtara</option>
+                                    <option>Khunti</option>
+                                    <option>Koderma</option>
+                                    <option>Latehar</option>
+                                    <option>Lohardaga</option>
+                                    <option>Pakur</option>
+                                    <option>Palamu</option>
+                                    <option>Ramgarh</option>
+                                    <option>Ranchi</option>
+                                    <option>Sahibganj</option>
+                                    <option>Sarikela Kharsawan</option>
+                                    <option>Simdega</option>
+                                    <option>West Singhbhum</option>
+
+                                </select>
+                            </div>
+
+                            <div class="form-group full">
+                                <label>
+                                    Village / Landmark / Street Area
+                                </label>
+                                <input type="text" id="area" placeholder="Enter village or specific area">
+                            </div>
+
+                        </div>
+
+                        <!-- Hidden Coordinate & Extended Location Storage -->
+                        <input type="hidden" id="latitude" name="latitude">
+                        <input type="hidden" id="longitude" name="longitude">
+                        <input type="hidden" id="locAccuracy" name="accuracy">
+                        <input type="hidden" id="locFormattedAddress" name="formatted_address">
+                        <input type="hidden" id="locSource" name="location_source" value="manual">
+                        <input type="hidden" id="locConfirmed" name="location_confirmed" value="false">
+                        <input type="hidden" id="locTimestamp" name="location_timestamp">
+
+                        <!-- Interactive Map Section -->
+                        <div class="map-wrapper" style="margin-top: 1.25rem;">
+                            <div class="map-toolbar">
+                                <div class="map-title-area">
+                                    <span class="map-title"><i class="ri-map-2-line"></i> Interactive Location Map</span>
+                                    <span class="map-live-indicator" id="mapLiveIndicator" style="display: none;">
+                                        <span class="live-dot-pulse"></span> 🔴 Live Location Active
+                                    </span>
+                                </div>
+                                <span class="map-hint"><i class="ri-drag-move-line"></i> Drag marker or click anywhere to adjust location</span>
+                            </div>
+
+                            <!-- Direct Leaflet Map Container -->
+                            <div id="problemLocationMap" class="problem-location-map" style="width: 100%; height: 500px; min-height: 360px;"></div>
+
+                            <small class="map-footer-help"><i class="ri-information-line"></i> Moving the marker will automatically update GPS coordinates and reverse-geocode District, State &amp; Area.</small>
+
+                            <!-- Location Confirmation Panel -->
+                            <div class="location-confirmation-panel" id="locationConfirmationPanel">
+                                <div class="conf-panel-header">
+                                    <div class="conf-title">
+                                        <i class="ri-map-pin-2-fill"></i>
+                                        <span>📍 Selected Problem Location</span>
+                                    </div>
+                                    <span class="conf-status-badge pending" id="confStatusBadge">Pending Confirmation</span>
+                                </div>
+                                <div class="conf-grid">
+                                    <div class="conf-cell">
+                                        <span class="conf-label">State:</span>
+                                        <strong class="conf-val" id="confStateText">Jharkhand</strong>
+                                    </div>
+                                    <div class="conf-cell">
+                                        <span class="conf-label">District:</span>
+                                        <strong class="conf-val" id="confDistrictText">Not selected</strong>
+                                    </div>
+                                    <div class="conf-cell">
+                                        <span class="conf-label">Village / Area:</span>
+                                        <strong class="conf-val" id="confAreaText">--</strong>
+                                    </div>
+                                    <div class="conf-cell">
+                                        <span class="conf-label">Latitude:</span>
+                                        <strong class="conf-val" id="confLatText">--</strong>
+                                    </div>
+                                    <div class="conf-cell">
+                                        <span class="conf-label">Longitude:</span>
+                                        <strong class="conf-val" id="confLonText">--</strong>
+                                    </div>
+                                    <div class="conf-cell">
+                                        <span class="conf-label">Accuracy:</span>
+                                        <strong class="conf-val" id="confAccuracyText">-- m</strong>
+                                    </div>
+                                    <div class="conf-cell conf-cell-full">
+                                        <span class="conf-label">Formatted Address:</span>
+                                        <strong class="conf-val" id="confAddressText">Select a point on the map or use current location</strong>
+                                    </div>
+                                </div>
+                                <div class="conf-footer-row">
+                                    <button type="button" class="btn-confirm-location" id="btnConfirmLocation" onclick="confirmSelectedLocation()">
+                                        <i class="ri-check-line"></i>
+                                        <span>Confirm This Location</span>
+                                    </button>
+                                    <span class="conf-feedback-msg" id="confFeedbackMsg"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-section">
+
+                        <h3>
+                            <i class="ri-attachment-2"></i>
+                            Evidence
+                        </h3>
+
+                        <div class="upload-box">
+
+                            <i class="ri-upload-cloud-2-line"></i>
+
+                            <h4>
+                                Upload Photos / Videos / Documents
+                            </h4>
+
+                            <p>
+                                Supported formats: JPG, PNG, MP4, PDF
+                            </p>
+
+                            <input type="file" id="evidence" multiple accept="image/*,video/*,.pdf">
+
+                            <label for="evidence" class="upload-btn">
+                                Choose Files
+                            </label>
+
+                            <div id="fileList"></div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="ai-analysis-hub" id="aiAnalysisHub">
+
+                        <div class="ai-hub-header">
+                            <div class="ai-hub-title-row">
+                                <div class="ai-icon">🤖</div>
+                                <div>
+                                    <h3>AI Analysis &amp; Integrity Verification</h3>
+                                    <p id="aiAnalysisHeaderDesc">Real-time category intelligence, location consistency check &amp; duplicate verification.</p>
+                                </div>
+                            </div>
+                            <span class="ai-pulse-pill" id="aiLiveAnalysisBadge"><i class="ri-pulse-line"></i> Real-time Active</span>
+                        </div>
+
+                        <!-- 1. Category Detection Snapshot -->
+                        <div class="ai-subcard" id="aiCatSummaryCard">
+                            <div class="ai-subcard-header">
+                                <span class="ai-subcard-label"><i class="ri-sparkling-2-fill"></i> Category Intelligence</span>
+                                <span class="ai-tag-pill" id="aiCatSummaryConfidence">Confidence: --%</span>
+                            </div>
+                            <div class="ai-subcard-body" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+                                <div>
+                                    <span style="color: var(--muted); font-size: 0.82rem;">Detected Domain: </span>
+                                    <strong id="aiCatSummaryName" style="color: var(--text-dark); font-size: 0.95rem;">Pending text input</strong>
+                                </div>
+                                <span class="badge-status-neutral" id="aiCatSummaryTag">Awaiting Input</span>
+                            </div>
+                        </div>
+
+                        <!-- 2. LOCATION-BASED FRAUD & MISMATCH DETECTION CARD (Feature 1) -->
+                        <div class="ai-subcard location-verification-subcard" id="aiLocationVerificationCard">
+                            <div class="ai-subcard-header">
+                                <span class="ai-subcard-label"><i class="ri-map-pin-user-line"></i> 📍 Location Verification</span>
+                                <span class="status-pill status-pill-neutral" id="locationStatusPill">
+                                    <i class="ri-radar-line"></i> Awaiting GPS Coordinates
+                                </span>
+                            </div>
+
+                            <div class="location-details-grid" id="locationDetailsGrid">
+                                <div class="loc-col">
+                                    <small>Current GPS:</small>
+                                    <strong id="locCurrentGpsText">Not detected</strong>
+                                </div>
+                                <div class="loc-col">
+                                    <small>Reported Location:</small>
+                                    <strong id="locReportedLocationText">Not selected</strong>
+                                </div>
+                                <div class="loc-col">
+                                    <small>Haversine Distance:</small>
+                                    <strong id="locDistanceText">-- km</strong>
+                                </div>
+                                <div class="loc-col">
+                                    <small>Suspicion Risk:</small>
+                                    <strong id="locSuspicionText">--%</strong>
+                                </div>
+                            </div>
+
+                            <!-- Location Consistency & Verification Status Rows (Feature 1) -->
+                            <div class="location-consistency-row" id="locationConsistencyRow" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; margin-top: 10px; padding: 8px 12px; background: rgba(241, 245, 249, 0.6); border-radius: 8px; border: 1px solid rgba(226, 232, 240, 0.8);">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">LOCATION CONSISTENCY:</span>
+                                    <strong id="locConsistencyText" style="font-size: 0.85rem; color: #10b981;">🟢 Location Consistent</strong>
+                                </div>
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 0.78rem; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px;">VERIFICATION:</span>
+                                    <strong id="locVerificationText" style="font-size: 0.85rem; color: #059669;">Automatically Verified</strong>
+                                </div>
+                            </div>
+
+                            <!-- Live Warning or Verification Notice Banner -->
+                            <div class="loc-alert-banner" id="locAlertBanner" style="display: none;">
+                                <div class="loc-alert-icon" id="locAlertIcon"><i class="ri-alert-line"></i></div>
+                                <div class="loc-alert-content">
+                                    <strong id="locAlertTitle">Location Mismatch Detected</strong>
+                                    <p id="locAlertMsg">Your current GPS location appears to be different from the reported problem location.</p>
+                                </div>
+                            </div>
+
+                            <div class="subcard-footer-row">
+                                <div style="display: flex; align-items: center; gap: 6px;">
+                                    <span style="font-size: 0.8rem; color: var(--muted);">Status:</span>
+                                    <strong id="locStatusBadge" style="font-size: 0.85rem; color: #10b981;">✓ Awaiting Check</strong>
+                                </div>
+                                <button type="button" class="btn-link-action" onclick="toggleLocationExplanation()">
+                                    <i class="ri-information-line"></i> <span id="locDetailsToggleText">View Details</span>
+                                </button>
+                            </div>
+
+                            <div class="loc-explain-drawer" id="locExplainDrawer" style="display: none;">
+                                <div class="loc-explain-inner" style="font-size: 0.82rem; color: var(--text-dark);">
+                                    <div style="font-weight: 700; color: var(--primary); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; font-size: 0.88rem;">
+                                        <i class="ri-shield-check-line"></i> Location Verification &amp; Fraud-Risk Telemetry
+                                    </div>
+                                    
+                                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 10px; background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0;">
+                                        <div><span style="color: var(--muted);">Current GPS:</span> <strong id="detCurrentGps">--</strong></div>
+                                        <div><span style="color: var(--muted);">Reported Location:</span> <strong id="detReportedLoc">--</strong></div>
+                                        <div><span style="color: var(--muted);">GPS Accuracy:</span> <strong id="detGpsAccuracy">--</strong></div>
+                                        <div><span style="color: var(--muted);">Reported Location Accuracy:</span> <strong id="detReportedAccuracy">--</strong></div>
+                                        <div><span style="color: var(--muted);">Distance:</span> <strong id="detDistance">--</strong></div>
+                                        <div><span style="color: var(--muted);">Location Status:</span> <strong id="detLocationStatus">--</strong></div>
+                                    </div>
+
+                                    <div style="background: #ffffff; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; margin-bottom: 10px;">
+                                        <div style="font-weight: 600; color: #1e293b; margin-bottom: 6px;">Risk Signal Contribution Breakdown:</div>
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; font-size: 0.78rem;">
+                                            <div>• Distance Contribution: <strong id="detLocRisk">0 pts</strong></div>
+                                            <div>• Duplicate Similarity: <strong id="detDupSignal">0 pts (No match)</strong></div>
+                                            <div>• Verification Status: <strong id="detUserSignal">-15 pts (Verified citizen session)</strong></div>
+                                            <div>• Report Consistency: <strong id="detReportConsistency">-10 pts (Strong detail)</strong></div>
+                                            <div>• Travel Consistency: <strong id="detTravelSignal">0 pts (Normal range)</strong></div>
+                                            <div>• Final Suspicion Risk: <strong id="detFinalRisk" style="color: #10b981;">0% (LOW RISK)</strong></div>
+                                        </div>
+                                        <div style="margin-top: 8px; padding-top: 6px; border-top: 1px dashed #e2e8f0; font-size: 0.8rem;">
+                                            <span style="color: var(--muted);">Recommended Action:</span> <strong id="detRecommendedAction" style="color: #059669;">Normal Processing</strong>
+                                        </div>
+                                    </div>
+
+                                    <div style="background: rgba(37, 99, 235, 0.06); border-left: 3px solid #2563eb; padding: 8px 10px; border-radius: 4px; font-size: 0.78rem; line-height: 1.45; color: #1e40af;">
+                                        <strong><i class="ri-information-line"></i> Citizen Fair Reporting Notice:</strong><br>
+                                        Distance from the user's current GPS location is only one verification signal. A distant reported location does not automatically indicate fraud, because citizens may report problems occurring away from their current location.
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 3. DUPLICATE REPORT DETECTION CARD (Feature 2) -->
+                        <div class="ai-subcard duplicate-warning-subcard" id="aiDuplicateCard" style="display: none;">
+                            <div class="ai-subcard-header">
+                                <span class="ai-subcard-label" style="color: #b45309;"><i class="ri-refresh-line"></i> 🔄 SIMILAR PROBLEM ALREADY REPORTED</span>
+                                <span class="status-pill status-pill-warning" id="duplicateStatusPill">
+                                    <i class="ri-alert-fill"></i> Similarity: 82%
+                                </span>
+                            </div>
+
+                            <p class="duplicate-intro-text" id="duplicateIntroText">
+                                We found a similar problem in your area. Review the existing report before finalizing your submission.
+                            </p>
+
+                            <div class="duplicate-item-preview" id="duplicateItemPreview">
+                                <div class="dup-grid-meta">
+                                    <div class="dup-meta-item">
+                                        <small>Existing Report:</small>
+                                        <strong id="dupExistingId">#REP-1024</strong>
+                                    </div>
+                                    <div class="dup-meta-item">
+                                        <small>Category:</small>
+                                        <strong id="dupExistingCategory">Water Management</strong>
+                                    </div>
+                                    <div class="dup-meta-item">
+                                        <small>District / Locality:</small>
+                                        <strong id="dupExistingLocation">Ranchi</strong>
+                                    </div>
+                                    <div class="dup-meta-item">
+                                        <small>Distance:</small>
+                                        <strong id="dupExistingDistance">250 meters</strong>
+                                    </div>
+                                    <div class="dup-meta-item">
+                                        <small>Status:</small>
+                                        <strong id="dupExistingStatus">Potential Duplicate</strong>
+                                    </div>
+                                    <div class="dup-meta-item">
+                                        <small>Supporters:</small>
+                                        <strong id="dupExistingSupportCount">1</strong>
+                                    </div>
+                                </div>
+                                <div class="dup-title-row" style="margin-top: 10px;">
+                                    <small style="color: var(--muted);">Title:</small>
+                                    <div id="dupExistingTitle" style="font-weight: 600; color: var(--text-dark); margin-top: 2px;">“Water supply problem in Ward 12”</div>
+                                </div>
+                                <!-- Matching Reasons Badges -->
+                                <div class="dup-reasons-wrap" style="margin-top: 10px;">
+                                    <small style="color: var(--muted); display: block; margin-bottom: 4px;"><i class="ri-flashlight-line"></i> Detection Signals:</small>
+                                    <div class="dup-reasons-chips" id="dupReasonsChips">
+                                        <span class="reason-chip">High text similarity</span>
+                                        <span class="reason-chip">Nearby location</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="duplicate-actions-toolbar">
+                                <button type="button" class="dup-btn support-btn" id="btnSupportDup" onclick="supportExistingProblemAction()">
+                                    <i class="ri-thumb-up-line"></i> 👍 SUPPORT THIS REPORT
+                                </button>
+                                <button type="button" class="dup-btn report-anyway-btn" id="btnReportAnyway" onclick="reportAnywayAction()">
+                                    <i class="ri-send-plane-line"></i> 📝 REPORT ANYWAY
+                                </button>
+                                <button type="button" class="dup-btn view-btn" id="btnViewExistingDup" onclick="viewExistingDuplicateModal()">
+                                    <i class="ri-eye-line"></i> 👁 VIEW EXISTING REPORT
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-actions">
+
+                        <button type="button" class="secondary-btn" onclick="resetForm()">
+                            Cancel
+                        </button>
+
+                        <button type="submit" class="primary-btn">
+                            <i class="ri-send-plane-line"></i>
+                            Submit Problem
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PROBLEMS ================= -->
+
+        <section id="problems" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <p class="eyebrow">PROBLEM MANAGEMENT</p>
+                    <h1>Community Problems</h1>
+                    <p>
+                        Browse and manage reported societal challenges.
+                    </p>
+                </div>
+
+            </div>
+
+
+            <div class="filters">
+
+                <input type="text" id="problemSearch" placeholder="🔎 Search problems..." onkeyup="filterProblems()">
+
+                <select id="problemCategory" onchange="filterProblems()">
+
+                    <option value="">All Categories</option>
+                    <option>Education</option>
+                    <option>Healthcare</option>
+                    <option>Agriculture</option>
+                    <option>Water</option>
+                    <option>Environment</option>
+
+                </select>
+
+                <select id="problemStatus" onchange="filterProblems()">
+
+                    <option value="">All Status</option>
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Solved">Solved</option>
+                    <option value="Verified">✓ Verified</option>
+                    <option value="Needs Verification">⚠ Needs Verification</option>
+                    <option value="Location Mismatch">⚠ Location Mismatch</option>
+                    <option value="Possible Duplicate">⚠ Possible Duplicate</option>
+
+                </select>
+
+            </div>
+
+
+            <div id="problemCards" class="problem-cards">
+
+                <div class="problem-card" data-category="Water">
+
+                    <div class="card-top">
+
+                        <span class="badge high">
+                            High Priority
+                        </span>
+
+                        <span>
+                            #SCP-1001
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        Drinking Water Shortage
+                    </h3>
+
+                    <p>
+                        Villagers are facing shortage of clean drinking
+                        water during summer.
+                    </p>
+
+                    <div class="card-meta">
+
+                        <span>
+                            📍 Gumla
+                        </span>
+
+                        <span>
+                            💧 Water
+                        </span>
+
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="status in-progress">
+                            In Progress
+                        </span>
+                        <div class="card-actions">
+                            <button type="button" class="primary-btn ai-matches-btn" onclick="openProblemMatches('SCP-1001')">
+                                <i class="ri-cpu-line"></i> AI Matches
+                            </button>
+                            <button type="button" class="details-btn" onclick="viewProblem('SCP-1001')">
+                                Details →
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="problem-card" data-category="Education">
+
+                    <div class="card-top">
+
+                        <span class="badge medium">
+                            Medium Priority
+                        </span>
+
+                        <span>
+                            #SCP-1002
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        Teacher Shortage
+                    </h3>
+
+                    <p>
+                        Government school requires teachers for science
+                        and mathematics subjects.
+                    </p>
+
+                    <div class="card-meta">
+
+                        <span>
+                            📍 Ranchi
+                        </span>
+
+                        <span>
+                            🎓 Education
+                        </span>
+
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="status pending">
+                            Pending
+                        </span>
+                        <div class="card-actions">
+                            <button type="button" class="primary-btn ai-matches-btn" onclick="openProblemMatches('SCP-1002')">
+                                <i class="ri-cpu-line"></i> AI Matches
+                            </button>
+                            <button type="button" class="details-btn" onclick="viewProblem('SCP-1002')">
+                                Details →
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <div class="problem-card" data-category="Agriculture">
+
+                    <div class="card-top">
+
+                        <span class="badge high">
+                            High Priority
+                        </span>
+
+                        <span>
+                            #SCP-1003
+                        </span>
+
+                    </div>
+
+                    <h3>
+                        Smart Irrigation Requirement
+                    </h3>
+
+                    <p>
+                        Farmers need an affordable solution to reduce
+                        unnecessary water usage.
+                    </p>
+
+                    <div class="card-meta">
+
+                        <span>
+                            📍 Deoghar
+                        </span>
+
+                        <span>
+                            🌾 Agriculture
+                        </span>
+
+                    </div>
+
+                    <div class="card-footer">
+                        <span class="status solved">
+                            Solved
+                        </span>
+                        <div class="card-actions">
+                            <button type="button" class="primary-btn ai-matches-btn" onclick="openProblemMatches('SCP-1003')">
+                                <i class="ri-cpu-line"></i> AI Matches
+                            </button>
+                            <button type="button" class="details-btn" onclick="viewProblem('SCP-1003')">
+                                Details →
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SMART MATCHING (AI RECOMMENDATION ENGINE) ================= -->
+        <section id="matching" class="page">
+
+            <div class="page-header">
+                <div>
+                    <p class="eyebrow"><i class="ri-sparkling-fill" style="color: var(--primary);"></i> SMART INDIA HACKATHON
+                        2026 AI CORE</p>
+                    <h1>Automatic University + Industry Matching</h1>
+                    <p>Explainable AI engine matching societal challenges with Jharkhand academic centers and
+                        industry/CSR partners.</p>
+                </div>
+
+                <div class="matching-header-actions">
+                    <div class="matching-problem-selector">
+                        <i class="ri-file-search-line"></i>
+                        <label for="activeProblemSelect"
+                            style="font-weight: 600; font-size: 0.82rem; color: var(--text-muted);">Active
+                            Problem:</label>
+                        <select id="activeProblemSelect" onchange="handleProblemSelectionChange(this.value)">
+                            <!-- Populated dynamically -->
+                        </select>
+                    </div>
+
+                    <button class="primary-btn" onclick="refreshMatchingForActiveProblem()"
+                        title="Recompute match scores using latest profile updates">
+                        <i class="ri-refresh-line"></i> Refresh Matches
+                    </button>
+                </div>
+            </div>
+
+            <!-- OVERVIEW STAT CARDS -->
+            <div class="stats-grid" id="matchingOverviewStats">
+                <div class="stat-card">
+                    <div class="stat-icon blue">
+                        <i class="ri-file-text-line"></i>
+                    </div>
+                    <div>
+                        <span>Problems Matched</span>
+                        <h2 id="kpiProblemsMatched">6</h2>
+                        <small class="positive">100% Automated</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon purple">
+                        <i class="ri-school-line"></i>
+                    </div>
+                    <div>
+                        <span>Universities Recommended</span>
+                        <h2 id="kpiUnisRecommended">24</h2>
+                        <small class="positive">Across Jharkhand</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon orange">
+                        <i class="ri-building-line"></i>
+                    </div>
+                    <div>
+                        <span>Industry / CSR Partners</span>
+                        <h2 id="kpiIndustriesRecommended">25</h2>
+                        <small class="positive">Active CSR Sectors</small>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon green">
+                        <i class="ri-hand-heart-line"></i>
+                    </div>
+                    <div>
+                        <span>Active Collaborations</span>
+                        <h2 id="kpiActiveCollabs">4</h2>
+                        <small class="positive">From Pilot to Deploy</small>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACTIVE PROBLEM ANALYSIS CARD -->
+            <div class="problem-analysis-card" id="activeProblemCard">
+                <!-- Dynamically populated by JS: Title, Description, Priority, Location, Extracted Skills, Domains, Tech, Resources, Impact -->
+            </div>
+
+            <!-- FILTERS & SEARCH CONTROLS -->
+            <div class="matching-filter-bar">
+                <div class="matching-filter-group">
+                    <div class="filter-input-wrap">
+                        <i class="ri-search-line"></i>
+                        <input type="text" id="matchingKeywordSearch" placeholder="Filter by skill, tech, department..."
+                            oninput="handleMatchingFilterChange()">
+                    </div>
+
+                    <select id="matchingCategoryFilter" class="matching-select" onchange="handleMatchingFilterChange()">
+                        <option value="">All Categories</option>
+                        <option value="Water">Water Management</option>
+                        <option value="Agriculture">Agriculture & AgriTech</option>
+                        <option value="Healthcare">Healthcare & Medicine</option>
+                        <option value="Education">Education & Skills</option>
+                        <option value="Environment">Environment & Slag</option>
+                        <option value="Energy">Energy & Solar</option>
+                    </select>
+
+                    <select id="matchingDistrictFilter" class="matching-select" onchange="handleMatchingFilterChange()">
+                        <option value="">All Districts</option>
+                        <option value="Gumla">Gumla</option>
+                        <option value="Ranchi">Ranchi</option>
+                        <option value="Dhanbad">Dhanbad</option>
+                        <option value="Deoghar">Deoghar</option>
+                        <option value="Dumka">Dumka</option>
+                        <option value="East Singhbhum">East Singhbhum (Jamshedpur)</option>
+                    </select>
+
+                    <div class="score-slider-wrap">
+                        <span>Min Match:</span>
+                        <input type="range" id="matchingMinScoreSlider" min="30" max="95" value="50" step="5"
+                            oninput="handleMinScoreSlider(this.value)">
+                        <span class="score-value-badge" id="matchingScoreSliderVal">50%+</span>
+                    </div>
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <select id="matchingSortOrder" class="matching-select" onchange="handleMatchingFilterChange()">
+                        <option value="score">Sort: Highest Match Score</option>
+                        <option value="location">Sort: Nearest / Regional</option>
+                        <option value="name">Sort: Organization Name A-Z</option>
+                    </select>
+
+                    <button class="secondary-btn" onclick="resetMatchingFilters()" title="Reset all filters">
+                        <i class="ri-filter-off-line"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABS NAVIGATION -->
+            <div class="matching-tabs-nav">
+                <button class="matching-tab-btn active" id="tabBtnAll" onclick="switchMatchingTab('all')">
+                    <i class="ri-dashboard-3-line"></i> All Recommendations
+                    <span class="tab-count-pill" id="badgeCountAll">0</span>
+                </button>
+                <button class="matching-tab-btn" id="tabBtnUnis" onclick="switchMatchingTab('unis')">
+                    <i class="ri-school-line"></i> Recommended Universities
+                    <span class="tab-count-pill" id="badgeCountUnis">0</span>
+                </button>
+                <button class="matching-tab-btn" id="tabBtnInds" onclick="switchMatchingTab('inds')">
+                    <i class="ri-building-line"></i> Recommended Industry & CSR
+                    <span class="tab-count-pill" id="badgeCountInds">0</span>
+                </button>
+                <button class="matching-tab-btn" id="tabBtnCollabs" onclick="switchMatchingTab('collabs')">
+                    <i class="ri-team-line"></i> Active Collaborations Tracker
+                    <span class="tab-count-pill" id="badgeCountCollabs">0</span>
+                </button>
+            </div>
+
+            <!-- TAB CONTENT 1: UNIVERSITIES LIST -->
+            <div id="tabContentUnis">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+                    <h3
+                        style="font-size: 1.15rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <i class="ri-school-line" style="color: var(--primary);"></i> Recommended Higher Education
+                        Institutions (HEIs)
+                    </h3>
+                    <small style="color: var(--text-muted);" id="uniMatchSubtext">Ranked by weighted domain, skill,
+                        research, and infrastructure fit</small>
+                </div>
+                <div class="matches-grid" id="universityMatchesGrid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- TAB CONTENT 2: INDUSTRY & CSR LIST -->
+            <div id="tabContentInds">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; margin-top: 10px;">
+                    <h3
+                        style="font-size: 1.15rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                        <i class="ri-building-line" style="color: var(--purple);"></i> Recommended Industry, Startup &
+                        CSR Partners
+                    </h3>
+                    <small style="color: var(--text-muted);" id="indMatchSubtext">Ranked by technology match, CSR
+                        alignment, and prototyping capabilities</small>
+                </div>
+                <div class="matches-grid" id="industryMatchesGrid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- TAB CONTENT 3: COLLABORATIONS TRACKER -->
+            <div id="tabContentCollabs" style="display: none;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                    <div>
+                        <h3
+                            style="font-size: 1.15rem; color: var(--text-primary); display: flex; align-items: center; gap: 8px;">
+                            <i class="ri-git-merge-line" style="color: var(--green);"></i> Solution Lifecycle &
+                            Collaboration Tracker
+                        </h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem;">
+                            Track solutions from partner expression of interest to prototyping, field testing, and
+                            statewide deployment.
+                        </p>
+                    </div>
+                    <button class="primary-btn" onclick="openCollaborationModal(null, null, 'general')">
+                        <i class="ri-add-line"></i> Propose New Partnership
+                    </button>
+                </div>
+                <div class="collaborations-container" id="collaborationsList">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- FALLBACK: BROADEN SEARCH BANNER -->
+            <div class="broaden-search-banner" id="broadenSearchBanner" style="display: none;">
+                <div class="banner-icon">
+                    <i class="ri-compass-3-line"></i>
+                </div>
+                <h3>No strong match found for current strict criteria</h3>
+                <p>The system applied strict domain, skill, and location filters. Broaden your search to explore
+                    adjacent academic departments, statewide technology centers, and flexible CSR grants.</p>
+                <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap;">
+                    <button class="primary-btn" onclick="broadenSearchCriteria()">
+                        <i class="ri-zoom-out-line"></i> Broaden Search Scope
+                    </button>
+                    <button class="secondary-btn" onclick="resetMatchingFilters()">
+                        <i class="ri-restart-line"></i> Reset Filters
+                    </button>
+                </div>
+            </div>
+
+        </section>
+
+
+        <!-- ================= UNIVERSITIES ================= -->
+
+        <section id="universities" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <p class="eyebrow">ACADEMIC COLLABORATION</p>
+
+                    <h1>University Network</h1>
+
+                    <p>
+                        Universities participating in societal innovation.
+                    </p>
+                </div>
+
+                <!-- More Universities Trigger Button at Circled Location -->
+                <div class="more-universities-container" id="moreUniversitiesContainer">
+                    <button class="more-universities-btn" id="moreUniversitiesBtn"
+                        onclick="toggleMoreUniversitiesSection()" aria-expanded="true" type="button"
+                        title="View all Jharkhand Research Universities">
+                        <i class="ri-school-line"></i>
+                        <span>More Universities</span>
+                        <span class="uni-count-badge" id="uniCountBadge">23</span>
+                        <i class="ri-arrow-down-s-line dropdown-arrow" id="uniDropdownArrow"></i>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="university-grid" id="universityGrid">
+
+                <div class="university-card" id="card-uni-jharkhand">
+
+                    <div class="university-logo">
+                        🎓
+                    </div>
+
+                    <h3>
+                        University of Jharkhand
+                    </h3>
+
+                    <p>
+                        Research & Innovation Centre
+                    </p>
+
+                    <div class="tags">
+
+                        <span>AI/ML</span>
+                        <span>Water</span>
+                        <span>Agriculture</span>
+
+                    </div>
+
+                    <button class="outline-btn" onclick="openUniversityProfile('University of Jharkhand')">
+                        View Profile
+                    </button>
+
+                </div>
+
+
+                <div class="university-card" id="card-uni-rtu">
+
+                    <div class="university-logo">
+                        🎓
+                    </div>
+
+                    <h3>
+                        Ranchi Technical University
+                    </h3>
+
+                    <p>
+                        Engineering & Technology
+                    </p>
+
+                    <div class="tags">
+
+                        <span>IoT</span>
+                        <span>Energy</span>
+                        <span>Smart City</span>
+
+                    </div>
+
+                    <button class="outline-btn" onclick="openUniversityProfile('Ranchi Technical University')">
+                        View Profile
+                    </button>
+
+                </div>
+
+
+                <div class="university-card" id="card-uni-jii">
+
+                    <div class="university-logo">
+                        🎓
+                    </div>
+
+                    <h3>
+                        Jharkhand Innovation Institute
+                    </h3>
+
+                    <p>
+                        Innovation & Entrepreneurship
+                    </p>
+
+                    <div class="tags">
+
+                        <span>Startups</span>
+                        <span>AI</span>
+                        <span>Healthcare</span>
+
+                    </div>
+
+                    <button class="outline-btn" onclick="openUniversityProfile('Jharkhand Innovation Institute')">
+                        View Profile
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MORE UNIVERSITIES SECTION ================= -->
+            <div class="more-universities-section" id="moreUniversitiesSection">
+
+                <div class="more-uni-header-row">
+                    <div>
+                        <span class="eyebrow">JHARKHAND HIGHER EDUCATION & RESEARCH DIRECTORY</span>
+                        <h2>More Universities</h2>
+                        <p>Comprehensive list of major universities in Jharkhand participating in research, innovation,
+                            and multidisciplinary studies.</p>
+                    </div>
+                    <div class="more-uni-count-tag">
+                        <i class="ri-government-line"></i>
+                        <span id="totalUniversitiesCount">23 Universities Available</span>
+                    </div>
+                </div>
+
+                <!-- Search Universities -->
+                <div class="search-universities-card">
+                    <div class="search-input-group">
+                        <i class="ri-search-line search-icon"></i>
+                        <input type="text" id="searchUniversitiesInput"
+                            placeholder="Search universities by name or location (e.g. Ranchi, BIT, Dhanbad, Medical)..."
+                            oninput="handleUniversitySearch(this.value)" autocomplete="off">
+                        <button type="button" class="search-clear-btn" id="searchClearBtn"
+                            onclick="clearUniversitySearch()" title="Clear search" style="display: none;">
+                            <i class="ri-close-circle-fill"></i>
+                        </button>
+                    </div>
+                    <div class="search-status-bar">
+                        <span id="searchResultStats">Showing all universities (arranged alphabetically A–Z)</span>
+                        <span class="search-hint"><i class="ri-information-line"></i> Type to filter and visually
+                            highlight matching universities</span>
+                    </div>
+                </div>
+
+                <!-- Scrollable University Cards Container -->
+                <div class="scrollable-universities-container" id="scrollableUniversitiesContainer">
+                    <div class="more-universities-grid" id="moreUniversitiesGrid">
+                        <!-- Dynamically populated from universities data structure in my1.js -->
+                    </div>
+
+                    <div class="no-universities-found" id="noUniversitiesFound" style="display: none;">
+                        <div class="no-found-icon">🏫</div>
+                        <h3>No university found</h3>
+                        <p id="noFoundText">No universities matched your search query. Please check your spelling or
+                            search by district/city.</p>
+                        <button type="button" class="secondary-btn" onclick="clearUniversitySearch()">
+                            Reset Search
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+
+
+
+
+
+
+        <!-- ================= INDUSTRY ================= -->
+
+        <section id="industry" class="page">
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        INDUSTRY COLLABORATION
+                    </p>
+
+                    <h1>Industry Partners</h1>
+
+                    <p>
+                        Organizations supporting innovation through
+                        funding, mentorship and technology.
+                    </p>
+
+                </div>
+
+                <!-- More Industries Trigger Button at Top-Right -->
+                <div class="more-industries-container" id="moreIndustriesContainer">
+                    <button class="more-industries-btn" id="moreIndustriesBtn" onclick="toggleMoreIndustriesSection()"
+                        aria-expanded="true" type="button" title="View all Jharkhand Industry Partners & Sectors">
+                        <i class="ri-building-line"></i>
+                        <span>More Industries</span>
+                        <span class="industry-count-badge" id="industryCountBadge">25</span>
+                        <i class="ri-arrow-down-s-line dropdown-arrow" id="industryDropdownArrow"></i>
+                    </button>
+                </div>
+
+            </div>
+
+
+            <div class="industry-grid">
+
+                <div class="industry-card">
+
+                    <div class="industry-icon">
+                        🏢
+                    </div>
+
+                    <h3>
+                        Technology Partners
+                    </h3>
+
+                    <p>
+                        Provide technology and technical mentorship.
+                    </p>
+
+                    <button class="primary-btn" onclick="openIndustryProfile('Technology Partners')">
+                        Explore Projects
+                    </button>
+
+                </div>
+
+
+                <div class="industry-card">
+
+                    <div class="industry-icon">
+                        💰
+                    </div>
+
+                    <h3>
+                        CSR Organizations
+                    </h3>
+
+                    <p>
+                        Support projects through CSR funding.
+                    </p>
+
+                    <button class="primary-btn" onclick="openIndustryProfile('CSR Organizations')">
+                        View Opportunities
+                    </button>
+
+                </div>
+
+
+                <div class="industry-card">
+
+                    <div class="industry-icon">
+                        🚀
+                    </div>
+
+                    <h3>
+                        Startups & MSMEs
+                    </h3>
+
+                    <p>
+                        Help develop and deploy innovative solutions.
+                    </p>
+
+                    <button class="primary-btn" onclick="openIndustryProfile('Startups & MSMEs')">
+                        Partner With Us
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================= MORE INDUSTRIES SECTION ================= -->
+            <div class="more-industries-section" id="moreIndustriesSection">
+
+                <div class="more-industry-header-row">
+                    <div>
+                        <span class="eyebrow">JHARKHAND INDUSTRIAL ECOSYSTEM & PARTNERS</span>
+                        <h2>More Industries</h2>
+                        <p>Comprehensive directory of specialized industrial sectors, corporate partners, technology
+                            mentors, and enterprise funding in Jharkhand.</p>
+                    </div>
+                    <div class="more-industry-count-tag">
+                        <i class="ri-building-2-line"></i>
+                        <span id="totalIndustriesCount">25 Industries Available</span>
+                    </div>
+                </div>
+
+                <!-- Search Industries -->
+                <div class="search-industries-card">
+                    <div class="search-input-group">
+                        <i class="ri-search-line search-icon"></i>
+                        <input type="text" id="searchIndustriesInput"
+                            placeholder="Search industries by name or sector (e.g. Mining, Steel, Tech, Health, Agri, MSME)..."
+                            oninput="handleIndustrySearch(this.value)" autocomplete="off">
+                        <button type="button" class="search-clear-btn" id="searchIndustryClearBtn"
+                            onclick="clearIndustrySearch()" title="Clear search" style="display: none;">
+                            <i class="ri-close-circle-fill"></i>
+                        </button>
+                    </div>
+                    <div class="search-status-bar">
+                        <span id="searchIndustryResultStats">Showing all industries (arranged alphabetically A–Z)</span>
+                        <span class="search-hint"><i class="ri-information-line"></i> Type to filter and visually
+                            highlight matching industries</span>
+                    </div>
+                </div>
+
+                <!-- Scrollable Industry Cards Container -->
+                <div class="scrollable-industries-container" id="scrollableIndustriesContainer">
+                    <div class="more-industries-grid" id="moreIndustriesGrid">
+                        <!-- Dynamically populated from industries array in my1.js -->
+                    </div>
+
+                    <div class="no-industries-found" id="noIndustriesFound" style="display: none;">
+                        <div class="no-found-icon">🏭</div>
+                        <h3>No industry found</h3>
+                        <p id="noIndustryFoundText">No industries matched your search query. Try searching by another
+                            sector or keyword.</p>
+                        <button type="button" class="secondary-btn" onclick="clearIndustrySearch()">
+                            Reset Search
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= PROJECTS ================= -->
+
+        <section id="projects" class="page">
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        PROJECT LIFECYCLE
+                    </p>
+
+                    <h1>Innovation Projects</h1>
+
+                    <p>
+                        Track solutions from problem to implementation.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="timeline">
+
+                <div class="timeline-step completed">
+
+                    <div class="step-number">
+                        ✓
+                    </div>
+
+                    <div>
+                        <h3>
+                            Problem Submitted
+                        </h3>
+
+                        <p>
+                            Community identified a real-world problem.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step completed">
+
+                    <div class="step-number">
+                        ✓
+                    </div>
+
+                    <div>
+                        <h3>
+                            AI Analysis
+                        </h3>
+
+                        <p>
+                            Problem categorized and priority calculated.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step completed">
+
+                    <div class="step-number">
+                        ✓
+                    </div>
+
+                    <div>
+                        <h3>
+                            University Assigned
+                        </h3>
+
+                        <p>
+                            Suitable academic institution selected.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step active">
+
+                    <div class="step-number">
+                        4
+                    </div>
+
+                    <div>
+                        <h3>
+                            Prototype Development
+                        </h3>
+
+                        <p>
+                            Students and faculty are developing the solution.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="step-number">
+                        5
+                    </div>
+
+                    <div>
+                        <h3>
+                            Testing & Validation
+                        </h3>
+
+                        <p>
+                            Solution will be tested in the real environment.
+                        </p>
+                    </div>
+
+                </div>
+
+
+                <div class="timeline-step">
+
+                    <div class="step-number">
+                        6
+                    </div>
+
+                    <div>
+                        <h3>
+                            Implementation
+                        </h3>
+
+                        <p>
+                            Final solution deployed for the community.
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= ANALYTICS ================= -->
+
+        <section id="analytics" class="page">
+
+            <div class="page-header">
+
+                <div>
+
+                    <p class="eyebrow">
+                        DATA & ANALYTICS
+                    </p>
+
+                    <h1>Impact Analytics</h1>
+
+                    <p>
+                        Monitor societal challenges and measurable impact.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="analytics-grid">
+
+                <div class="analytics-card">
+
+                    <span>Total Districts</span>
+
+                    <strong>
+                        24
+                    </strong>
+
+                    <small>
+                        Covered across Jharkhand
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-card">
+
+                    <span>Universities</span>
+
+                    <strong>
+                        42
+                    </strong>
+
+                    <small>
+                        Active institutions
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-card">
+
+                    <span>Industry Partners</span>
+
+                    <strong>
+                        87
+                    </strong>
+
+                    <small>
+                        Supporting innovation
+                    </small>
+
+                </div>
+
+
+                <div class="analytics-card">
+
+                    <span>People Benefited</span>
+
+                    <strong>
+                        1.8M+
+                    </strong>
+
+                    <small>
+                        Estimated community impact
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="impact-panel">
+
+                <h3>
+                    Project Impact
+                </h3>
+
+                <div class="impact-item">
+
+                    <div>
+                        <span>Water Saved</span>
+                        <strong>2.4M Litres</strong>
+                    </div>
+
+                    <div class="progress">
+                        <div style="width:75%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-item">
+
+                    <div>
+                        <span>Students Involved</span>
+                        <strong>4,820</strong>
+                    </div>
+
+                    <div class="progress">
+                        <div style="width:82%"></div>
+                    </div>
+
+                </div>
+
+
+                <div class="impact-item">
+
+                    <div>
+                        <span>Solutions Deployed</span>
+                        <strong>420</strong>
+                    </div>
+
+                    <div class="progress">
+                        <div style="width:63%"></div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= SETTINGS ================= -->
+
+        <section id="settings" class="page">
+
+            <div class="page-header">
+
+                <div>
+                    <p class="eyebrow">PORTAL ADMINISTRATION</p>
+                    <h1>Admin Settings</h1>
+                    <p>Manage your administrator account, portal appearance, security, notifications, and system
+                        preferences.</p>
+                </div>
+
+                <div class="settings-header-actions">
+                    <button type="button" class="secondary-btn" onclick="confirmResetSettings()">
+                        <i class="ri-refresh-line"></i> Reset Defaults
+                    </button>
+                    <button type="button" class="primary-btn" onclick="saveAllSettingsManual()">
+                        <i class="ri-save-line"></i> Save Changes
+                    </button>
+                </div>
+
+            </div>
+
+            <div class="settings-grid">
+
+                <!-- 1. ACCOUNT CARD -->
+                <div class="settings-card account-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon blue">
+                            <i class="ri-user-settings-line"></i>
+                        </div>
+                        <div>
+                            <h3>Account Information</h3>
+                            <p>Manage your administrator identity and credentials</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-account-profile">
+                        <div class="settings-avatar" id="settingsAvatar">SK</div>
+                        <div class="settings-account-details">
+                            <div class="settings-name-row">
+                                <h4 id="settingsUserName">Shashank Kumar</h4>
+                                <span class="badge primary" id="settingsUserRole">Administrator</span>
+                            </div>
+                            <p class="settings-account-meta" id="settingsUserEmail">shashank.kumar@jharkhand.gov.in</p>
+                            <p class="settings-account-meta secondary" id="settingsUserDept">Department of Higher &
+                                Technical Education</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-account-info-grid">
+                        <div class="info-cell">
+                            <small>Department / Directorate</small>
+                            <strong id="settingsCellDept">Higher & Technical Education</strong>
+                        </div>
+                        <div class="info-cell">
+                            <small>Jurisdiction Location</small>
+                            <strong id="settingsCellLocation">Ranchi, Jharkhand</strong>
+                        </div>
+                        <div class="info-cell">
+                            <small>Security Clearance</small>
+                            <strong class="text-green"><i class="ri-shield-check-line"></i> Level 3 (State
+                                Admin)</strong>
+                        </div>
+                        <div class="info-cell">
+                            <small>Session Status</small>
+                            <strong class="text-blue" id="settingsCellSession"><i class="ri-radio-button-line"></i>
+                                Authenticated Active</strong>
+                        </div>
+                    </div>
+
+                    <div class="settings-account-actions">
+                        <button type="button" class="primary-btn" onclick="openEditProfileModal()">
+                            <i class="ri-edit-line"></i> Edit Profile
+                        </button>
+                        <button type="button" class="secondary-btn" onclick="confirmLogout()">
+                            <i class="ri-logout-box-r-line"></i> Log Out
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. APPEARANCE (DARK MODE) -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon purple">
+                            <i class="ri-palette-line"></i>
+                        </div>
+                        <div>
+                            <h3>Appearance & Theme</h3>
+                            <p>Customize the visual interface of the portal</p>
+                        </div>
+                    </div>
+
+                    <div class="setting-item-row">
+                        <div>
+                            <strong>Dark Mode</strong>
+                            <p>Switch between light and dark themes across the entire portal</p>
+                        </div>
+                        <label class="switch-toggle" for="darkModeToggle">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="theme-selector-group">
+                        <span class="setting-label">Visual Theme Selector</span>
+                        <div class="theme-cards-grid">
+                            <div class="theme-option-card" id="themeCardLight" onclick="selectTheme('light')">
+                                <div class="theme-preview light-preview">
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content">
+                                        <div class="preview-bar"></div>
+                                        <div class="preview-boxes">
+                                            <span></span><span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="theme-card-info">
+                                    <i class="ri-sun-line"></i>
+                                    <span>Light Mode</span>
+                                    <i class="ri-checkbox-circle-fill active-indicator"></i>
+                                </div>
+                            </div>
+
+                            <div class="theme-option-card" id="themeCardDark" onclick="selectTheme('dark')">
+                                <div class="theme-preview dark-preview">
+                                    <div class="preview-sidebar"></div>
+                                    <div class="preview-content">
+                                        <div class="preview-bar"></div>
+                                        <div class="preview-boxes">
+                                            <span></span><span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="theme-card-info">
+                                    <i class="ri-moon-line"></i>
+                                    <span>Dark Mode</span>
+                                    <i class="ri-checkbox-circle-fill active-indicator"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. NOTIFICATIONS -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon orange">
+                            <i class="ri-notification-3-line"></i>
+                        </div>
+                        <div>
+                            <h3>Notification Preferences</h3>
+                            <p>Select which real-time portal updates you want to receive</p>
+                        </div>
+                    </div>
+
+                    <div class="setting-toggles-list">
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>New Problem Submissions</strong>
+                                <p>Alerts when citizens report new societal problems</p>
+                            </div>
+                            <label class="switch-toggle" for="notifyProblems">
+                                <input type="checkbox" id="notifyProblems" checked
+                                    onchange="saveNotificationPref('problems', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>Project Milestone Updates</strong>
+                                <p>Progress notifications on active innovation solutions</p>
+                            </div>
+                            <label class="switch-toggle" for="notifyProjects">
+                                <input type="checkbox" id="notifyProjects" checked
+                                    onchange="saveNotificationPref('projects', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>University Network Updates</strong>
+                                <p>Notifications on academic research stream collaborations</p>
+                            </div>
+                            <label class="switch-toggle" for="notifyUniversities">
+                                <input type="checkbox" id="notifyUniversities" checked
+                                    onchange="saveNotificationPref('universities', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>Industry & Partner Inquiries</strong>
+                                <p>Alerts when companies explore CSR or tech sponsorships</p>
+                            </div>
+                            <label class="switch-toggle" for="notifyIndustry">
+                                <input type="checkbox" id="notifyIndustry" checked
+                                    onchange="saveNotificationPref('industry', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>System Alerts & Security</strong>
+                                <p>Maintenance windows, backup updates, and login notices</p>
+                            </div>
+                            <label class="switch-toggle" for="notifySystem">
+                                <input type="checkbox" id="notifySystem" checked
+                                    onchange="saveNotificationPref('system', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>Email Digest & Summaries</strong>
+                                <p>Weekly executive summaries delivered to your registered email</p>
+                            </div>
+                            <label class="switch-toggle" for="notifyEmail">
+                                <input type="checkbox" id="notifyEmail"
+                                    onchange="saveNotificationPref('email', this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. SECURITY (PASSWORD) -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon green">
+                            <i class="ri-lock-password-line"></i>
+                        </div>
+                        <div>
+                            <h3>Security & Password</h3>
+                            <p>Update administrator credentials and manage account protection</p>
+                        </div>
+                    </div>
+
+                    <form id="changePasswordForm" onsubmit="handleChangePassword(event)" class="settings-form">
+                        <div class="form-group">
+                            <label for="currentPassword">Current Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="currentPassword" placeholder="Enter current password"
+                                    required autocomplete="current-password">
+                                <button type="button" class="pwd-toggle-btn"
+                                    onclick="togglePasswordVisibility('currentPassword', 'eyeCurrent')">
+                                    <i class="ri-eye-line" id="eyeCurrent"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="newPassword">New Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="newPassword" placeholder="Minimum 6 characters" required
+                                    autocomplete="new-password">
+                                <button type="button" class="pwd-toggle-btn"
+                                    onclick="togglePasswordVisibility('newPassword', 'eyeNew')">
+                                    <i class="ri-eye-line" id="eyeNew"></i>
+                                </button>
+                            </div>
+                            <small class="password-hint">Use at least 6 characters with a combination of letters and
+                                numbers.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm New Password</label>
+                            <div class="password-input-wrapper">
+                                <input type="password" id="confirmPassword" placeholder="Re-enter new password" required
+                                    autocomplete="new-password">
+                                <button type="button" class="pwd-toggle-btn"
+                                    onclick="togglePasswordVisibility('confirmPassword', 'eyeConfirm')">
+                                    <i class="ri-eye-line" id="eyeConfirm"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="security-info-box">
+                            <i class="ri-shield-keyhole-line"></i>
+                            <div>
+                                <strong>Credential Security Note</strong>
+                                <p>Client validation is active. Once connected to the state government LDAP/SSO backend,
+                                    password updates will be committed to the SDC identity server.</p>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="primary-btn">
+                            <i class="ri-check-line"></i> Update Password
+                        </button>
+                    </form>
+                </div>
+
+                <!-- 5. PREFERENCES & ACCESSIBILITY -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon blue">
+                            <i class="ri-equalizer-line"></i>
+                        </div>
+                        <div>
+                            <h3>Preferences & Accessibility</h3>
+                            <p>Regional localization, text scaling, and animation preferences</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-form">
+                        <div class="form-group">
+                            <label for="prefLanguage">Portal Language</label>
+                            <select id="prefLanguage" onchange="saveGeneralPref('language', this.value)">
+                                <option value="en">English (Official Portal Default)</option>
+                                <option value="hi">हिन्दी (Hindi - Jharkhand State Official)</option>
+                            </select>
+                            <small class="password-hint">Sets primary portal language. Multilingual engine is prepared
+                                for localized strings.</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="prefDashboardView">Default Dashboard Focus</label>
+                            <select id="prefDashboardView" onchange="saveGeneralPref('dashboardView', this.value)">
+                                <option value="all">All Domains & Districts</option>
+                                <option value="water">Water Resource Management</option>
+                                <option value="agriculture">Agriculture & Irrigation</option>
+                                <option value="environment">Environment & Waste</option>
+                                <option value="health">Healthcare & Diagnostics</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>Reduce Animations</strong>
+                                <p>Minimizes visual motion and transitions for a faster experience</p>
+                            </div>
+                            <label class="switch-toggle" for="prefReduceMotion">
+                                <input type="checkbox" id="prefReduceMotion"
+                                    onchange="toggleReduceMotion(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>Larger Text Size</strong>
+                                <p>Increases readability across dashboards, tables, and forms</p>
+                            </div>
+                            <label class="switch-toggle" for="prefLargerText">
+                                <input type="checkbox" id="prefLargerText" onchange="toggleLargerText(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item-row">
+                            <div>
+                                <strong>High Contrast Mode</strong>
+                                <p>Enhances edge borders and text clarity for better visibility</p>
+                            </div>
+                            <label class="switch-toggle" for="prefHighContrast">
+                                <input type="checkbox" id="prefHighContrast"
+                                    onchange="toggleHighContrast(this.checked)">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 6. SYSTEM INFORMATION -->
+                <div class="settings-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon green">
+                            <i class="ri-server-line"></i>
+                        </div>
+                        <div>
+                            <h3>System & Portal Information</h3>
+                            <p>Build, environment, and runtime platform telemetry</p>
+                        </div>
+                    </div>
+
+                    <div class="system-info-table">
+                        <div class="sys-row">
+                            <span>Platform Name</span>
+                            <strong>Samadhan24/7</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Portal Entity</span>
+                            <strong>Jharkhand Innovation Portal</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Application Version</span>
+                            <strong>v2.4.0 (Enterprise State Build)</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Active Account Role</span>
+                            <strong class="badge primary">System Administrator</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Active UI Theme</span>
+                            <strong id="sysInfoTheme">Light Mode</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Hosting Environment</span>
+                            <strong>State Data Centre (SDC), Ranchi</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Client Session</span>
+                            <strong id="sysInfoSession">Active (Local State Secure)</strong>
+                        </div>
+                        <div class="sys-row">
+                            <span>Last Login Recorded</span>
+                            <strong id="sysInfoLastLogin">Today, 12 Sep 2026</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 7. DANGER ZONE -->
+                <div class="settings-card danger-card">
+                    <div class="settings-card-header">
+                        <div class="settings-card-icon red">
+                            <i class="ri-alert-line"></i>
+                        </div>
+                        <div>
+                            <h3>Danger Zone</h3>
+                            <p>Irreversible actions for session and personalized preferences</p>
+                        </div>
+                    </div>
+
+                    <div class="danger-actions-list">
+                        <div class="danger-action-item">
+                            <div>
+                                <strong>Reset All Personal Settings</strong>
+                                <p>Revert theme, notification preferences, and accessibility settings to default. Your
+                                    user account and portal data will remain intact.</p>
+                            </div>
+                            <button type="button" class="secondary-btn btn-warning" onclick="confirmResetSettings()">
+                                <i class="ri-restart-line"></i> Reset Settings
+                            </button>
+                        </div>
+
+                        <div class="danger-action-item">
+                            <div>
+                                <strong>Sign Out of Session</strong>
+                                <p>Terminate your active administrator session and return to the Samadhan24/7 sign-in
+                                    page.</p>
+                            </div>
+                            <button type="button" class="danger-btn" onclick="confirmLogout()">
+                                <i class="ri-logout-box-r-line"></i> Log Out
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- ================= NOTIFICATIONS CENTER ================= -->
+        <section id="notifications" class="page">
+
+            <div class="page-header">
+                <div>
+                    <p class="eyebrow">ALERT & MONITORING CENTER</p>
+                    <h1>Platform Notifications</h1>
+                    <p>Real-time updates on problem submissions, AI matching recommendations, and collaboration
+                        requests.</p>
+                </div>
+                <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                    <button class="secondary-btn" onclick="markAllNotificationsRead()">
+                        <i class="ri-check-double-line"></i> Mark All as Read
+                    </button>
+                    <button class="primary-btn" onclick="clearAllNotifications()">
+                        <i class="ri-delete-bin-line"></i> Clear Read
+                    </button>
+                </div>
+            </div>
+
+            <div class="notifications-page-container" id="notificationsContainer">
+                <!-- Dynamically populated by JS -->
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <!-- ================= UNIVERSITY PROFILE MODAL ================= -->
+
+    <div id="universityProfileModal" class="uni-modal-overlay" onclick="handleUniModalOverlayClick(event)">
+
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalUniName">
+
+            <div class="uni-modal-header">
+
+                <div class="uni-modal-badge" id="modalUniLogo">
+                    🎓
+                </div>
+
+                <div class="uni-modal-title-area">
+                    <span class="uni-status-pill">
+                        <i class="ri-checkbox-circle-fill"></i> Verified Academic Partner
+                    </span>
+                    <h2 id="modalUniName">University of Jharkhand</h2>
+                    <p id="modalUniDept">Research & Innovation Centre</p>
+                </div>
+
+                <button class="uni-modal-close" onclick="closeUniversityProfileModal()" aria-label="Close modal">
+                    <i class="ri-close-line"></i>
+                </button>
+
+            </div>
+
+            <div class="uni-modal-body">
+
+                <div class="uni-modal-info-row">
+                    <div class="uni-info-item">
+                        <i class="ri-map-pin-2-line"></i>
+                        <div>
+                            <small>Location</small>
+                            <strong id="modalUniLocation">Ranchi, Jharkhand</strong>
+                        </div>
+                    </div>
+
+                    <div class="uni-info-item">
+                        <i class="ri-team-line"></i>
+                        <div>
+                            <small>Portal Status</small>
+                            <strong>Active Partner</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Research & Focus Areas</h4>
+                    <div class="tags" id="modalUniTags">
+                        <span>AI/ML</span>
+                        <span>Water</span>
+                        <span>Agriculture</span>
+                    </div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>About & Key Initiatives</h4>
+                    <p id="modalUniDesc" class="uni-desc-text">
+                        Leading research and innovation center contributing to state-wide societal innovation
+                        challenges.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="uni-modal-footer">
+                <button class="secondary-btn" onclick="closeUniversityProfileModal()">
+                    Close
+                </button>
+                <button class="primary-btn" onclick="initiateCollaboration()">
+                    <i class="ri-shake-hands-line"></i> Connect & Collaborate
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= INDUSTRY PROFILE MODAL ================= -->
+
+    <div id="industryProfileModal" class="uni-modal-overlay" onclick="handleIndustryModalOverlayClick(event)">
+
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalIndName">
+
+            <div class="uni-modal-header">
+
+                <div class="uni-modal-badge" id="modalIndLogo">
+                    🏢
+                </div>
+
+                <div class="uni-modal-title-area">
+                    <span class="uni-status-pill">
+                        <i class="ri-checkbox-circle-fill"></i> Verified Industry Partner
+                    </span>
+                    <h2 id="modalIndName">Technology Partners</h2>
+                    <p id="modalIndSector">Enterprise Tech & Digital Innovation</p>
+                </div>
+
+                <button class="uni-modal-close" onclick="closeIndustryProfileModal()" aria-label="Close modal">
+                    <i class="ri-close-line"></i>
+                </button>
+
+            </div>
+
+            <div class="uni-modal-body">
+
+                <div class="uni-modal-info-row">
+                    <div class="uni-info-item">
+                        <i class="ri-building-line"></i>
+                        <div>
+                            <small>Sector / Domain</small>
+                            <strong id="modalIndDomain">Technology & IT/ITES</strong>
+                        </div>
+                    </div>
+
+                    <div class="uni-info-item">
+                        <i class="ri-shake-hands-line"></i>
+                        <div>
+                            <small>Partnership Model</small>
+                            <strong id="modalIndModel">Active Innovation Partner</strong>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Key Focus & Support Areas</h4>
+                    <div class="tags" id="modalIndTags">
+                        <span>Mentorship</span>
+                        <span>Technology</span>
+                        <span>Funding</span>
+                    </div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>About & Partnership Scope</h4>
+                    <p id="modalIndDesc" class="uni-desc-text">
+                        Organizations providing technological mentorship, capital funding, and deployment capabilities
+                        for societal innovation.
+                    </p>
+                </div>
+
+            </div>
+
+            <div class="uni-modal-footer">
+                <button class="secondary-btn" onclick="closeIndustryProfileModal()">
+                    Close
+                </button>
+                <button class="primary-btn" id="modalIndActionBtn" onclick="initiateIndustryCollaboration()">
+                    <i class="ri-mail-send-line"></i> Partner With Us
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= EDIT PROFILE MODAL ================= -->
+
+    <div id="editProfileModal" class="uni-modal-overlay" onclick="handleEditProfileOverlayClick(event)">
+
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="editProfileTitle">
+
+            <div class="uni-modal-header">
+
+                <div class="uni-modal-badge" style="background:#eff6ff; color:var(--primary); font-size:24px;">
+                    <i class="ri-user-line"></i>
+                </div>
+
+                <div class="uni-modal-title-area">
+                    <span class="uni-status-pill">
+                        <i class="ri-shield-user-line"></i> Administrator Profile
+                    </span>
+                    <h2 id="editProfileTitle">Edit Admin Profile</h2>
+                    <p>Update your personal information and contact details</p>
+                </div>
+
+                <button class="uni-modal-close" onclick="closeEditProfileModal()" aria-label="Close modal">
+                    <i class="ri-close-line"></i>
+                </button>
+
+            </div>
+
+            <form id="editProfileForm" onsubmit="saveUserProfile(event)">
+
+                <div class="uni-modal-body">
+
+                    <div class="form-grid">
+
+                        <div class="form-group">
+                            <label for="editProfileName">Full Name</label>
+                            <input type="text" id="editProfileName" required placeholder="Full Name">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editProfileRole">Administrative Role</label>
+                            <input type="text" id="editProfileRole" value="Administrator" readonly
+                                style="background:var(--background); cursor:not-allowed;"
+                                title="Role managed by State Identity Provider">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editProfileEmail">Official Email</label>
+                            <input type="email" id="editProfileEmail" required placeholder="email@jharkhand.gov.in">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="editProfilePhone">Contact Phone</label>
+                            <input type="tel" id="editProfilePhone" placeholder="+91 94311 00000">
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="editProfileDept">Department / Directorate</label>
+                            <input type="text" id="editProfileDept"
+                                placeholder="Department of Higher & Technical Education">
+                        </div>
+
+                        <div class="form-group full">
+                            <label for="editProfileLocation">Location / Office</label>
+                            <input type="text" id="editProfileLocation" placeholder="Nepal House, Doranda, Ranchi">
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="uni-modal-footer">
+                    <button type="button" class="secondary-btn" onclick="closeEditProfileModal()">
+                        Cancel
+                    </button>
+                    <button type="submit" class="primary-btn">
+                        <i class="ri-check-line"></i> Save Profile
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= LOGOUT CONFIRMATION MODAL ================= -->
+
+    <div id="logoutConfirmModal" class="uni-modal-overlay" onclick="handleLogoutOverlayClick(event)">
+
+        <div class="uni-modal-card confirmation-card" role="dialog" aria-modal="true"
+            aria-labelledby="logoutModalTitle">
+
+            <div class="confirm-modal-icon red">
+                <i class="ri-logout-box-r-line"></i>
+            </div>
+
+            <h3 id="logoutModalTitle">Are you sure you want to logout?</h3>
+            <p class="confirm-modal-text">You will be signed out of your administrator session on the Samadhan24/7
+                Innovation Portal. You can sign back in at any time.</p>
+
+            <div class="confirm-modal-actions">
+                <button type="button" class="secondary-btn" onclick="closeLogoutModal()">
+                    Cancel
+                </button>
+                <button type="button" class="danger-btn" onclick="executeLogout()">
+                    <i class="ri-logout-box-r-line"></i> Logout
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= RESET SETTINGS CONFIRMATION MODAL ================= -->
+
+    <div id="resetSettingsConfirmModal" class="uni-modal-overlay" onclick="handleResetOverlayClick(event)">
+
+        <div class="uni-modal-card confirmation-card" role="dialog" aria-modal="true" aria-labelledby="resetModalTitle">
+
+            <div class="confirm-modal-icon orange">
+                <i class="ri-restart-line"></i>
+            </div>
+
+            <h3 id="resetModalTitle">Reset all personal settings to default?</h3>
+            <p class="confirm-modal-text">This will reset your portal theme to Light Mode, restore notification
+                preferences, and reset accessibility options. Your account and portal data will remain completely
+                intact.</p>
+
+            <div class="confirm-modal-actions">
+                <button type="button" class="secondary-btn" onclick="closeResetSettingsModal()">
+                    Cancel
+                </button>
+                <button type="button" class="primary-btn btn-warning" onclick="executeResetSettings()">
+                    <i class="ri-restart-line"></i> Reset Defaults
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= PORTAL LOGIN OVERLAY SCREEN ================= -->
+
+    <div id="loginOverlayView" class="login-overlay-screen" style="display: none;">
+
+        <div class="login-card-container">
+
+            <div class="login-card-header">
+                <div class="login-logo-badge">
+                    <i class="ri-shield-keyhole-line"></i>
+                </div>
+                <h2>Samadhan24/7</h2>
+                <p class="login-sub">Jharkhand Innovation Portal • Administrator Access</p>
+            </div>
+
+            <div class="login-alert-banner">
+                <i class="ri-lock-line"></i>
+                <span>You have been signed out. Please sign in to access the administrator portal.</span>
+            </div>
+
+            <form id="portalLoginForm" onsubmit="executeLogin(event)" class="login-form">
+
+                <div class="form-group">
+                    <label for="loginEmail">Administrator Email</label>
+                    <div class="login-input-group">
+                        <i class="ri-mail-line"></i>
+                        <input type="email" id="loginEmail" value="admin@jharkhand.gov.in" required
+                            placeholder="admin@jharkhand.gov.in">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <div class="login-input-group">
+                        <i class="ri-lock-password-line"></i>
+                        <input type="password" id="loginPassword" value="password123" required
+                            placeholder="Enter password">
+                    </div>
+                </div>
+
+                <div class="login-options-row">
+                    <label class="remember-label">
+                        <input type="checkbox" id="loginRememberMe" checked>
+                        <span>Remember credentials</span>
+                    </label>
+                    <span class="security-demo-tag"><i class="ri-shield-check-line"></i> Demo Secure</span>
+                </div>
+
+                <button type="submit" class="primary-btn login-submit-btn">
+                    <i class="ri-login-box-line"></i> Sign In to Portal
+                </button>
+
+            </form>
+
+            <div class="login-card-footer">
+                <small>Government of Jharkhand • State Innovation Council</small>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================= SMART MATCHING UNIVERSITY DETAILS MODAL ================= -->
+    <div id="matchingUniModal" class="uni-modal-overlay"
+        onclick="handleMatchingModalOverlayClick(event, 'matchingUniModal')">
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalMatchUniName"
+            style="max-width: 650px;">
+            <div class="uni-modal-header">
+                <div class="uni-modal-badge" id="modalMatchUniEmoji" style="font-size: 2rem;">🎓</div>
+                <div class="uni-modal-title-group">
+                    <h2 id="modalMatchUniName">University Details</h2>
+                    <p class="uni-modal-location" id="modalMatchUniLocation"><i class="ri-map-pin-line"></i> Jharkhand
+                    </p>
+                </div>
+                <button type="button" class="uni-modal-close-btn" onclick="closeMatchingModal('matchingUniModal')"
+                    aria-label="Close modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <div class="uni-modal-body" style="max-height: 68vh; overflow-y: auto;">
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                    <div>
+                        <span
+                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Match
+                            Fit Rating</span>
+                        <h3 style="color: var(--primary); font-size: 1.25rem; font-weight: 800;"
+                            id="modalMatchUniScore">94% Match</h3>
+                    </div>
+                    <span class="badge high" id="modalMatchUniFitBadge">Apex Academic Partner</span>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>About Institution</h4>
+                    <p id="modalMatchUniDesc"
+                        style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;"></p>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Key Departments & Domains</h4>
+                    <div class="modal-tags" id="modalMatchUniDepartments"></div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Research Centers & Specialized Labs</h4>
+                    <div class="modal-tags" id="modalMatchUniFacilities"></div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Faculty Expertise & Student Skills</h4>
+                    <div class="modal-tags" id="modalMatchUniSkills"></div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Relevant Previous Innovations</h4>
+                    <div class="modal-tags" id="modalMatchUniProjects"></div>
+                </div>
+            </div>
+
+            <div class="uni-modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeMatchingModal('matchingUniModal')">
+                    Close
+                </button>
+                <button type="button" class="primary-btn" id="modalMatchUniActionBtn">
+                    <i class="ri-handshake-line"></i> Express Interest
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= SMART MATCHING INDUSTRY DETAILS MODAL ================= -->
+    <div id="matchingIndModal" class="uni-modal-overlay"
+        onclick="handleMatchingModalOverlayClick(event, 'matchingIndModal')">
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="modalMatchIndName"
+            style="max-width: 650px;">
+            <div class="uni-modal-header">
+                <div class="uni-modal-badge" id="modalMatchIndIcon" style="font-size: 2rem;">🏢</div>
+                <div class="uni-modal-title-group">
+                    <h2 id="modalMatchIndName">Industry Partner</h2>
+                    <p class="uni-modal-location" id="modalMatchIndSector"><i class="ri-briefcase-line"></i> Sector</p>
+                </div>
+                <button type="button" class="uni-modal-close-btn" onclick="closeMatchingModal('matchingIndModal')"
+                    aria-label="Close modal">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <div class="uni-modal-body" style="max-height: 68vh; overflow-y: auto;">
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; background: var(--bg-primary); padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; border: 1px solid var(--border-color);">
+                    <div>
+                        <span
+                            style="font-size: 0.75rem; text-transform: uppercase; color: var(--text-muted); font-weight: 700;">Industry
+                            Fit Rating</span>
+                        <h3 style="color: var(--purple); font-size: 1.25rem; font-weight: 800;" id="modalMatchIndScore">
+                            91% Match</h3>
+                    </div>
+                    <span class="badge high" id="modalMatchIndFundingBadge">High CSR Funding Tier</span>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Overview & Mission</h4>
+                    <p id="modalMatchIndDesc"
+                        style="font-size: 0.9rem; color: var(--text-secondary); line-height: 1.5;"></p>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Technologies & Infrastructure Offered</h4>
+                    <div class="modal-tags" id="modalMatchIndTech"></div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>CSR Focus & Impact Mandate</h4>
+                    <div class="modal-tags" id="modalMatchIndCsr"></div>
+                </div>
+
+                <div class="uni-modal-section">
+                    <h4>Previous Public & Academic Collaborations</h4>
+                    <div class="modal-tags" id="modalMatchIndCollabs"></div>
+                </div>
+            </div>
+
+            <div class="uni-modal-footer">
+                <button type="button" class="secondary-btn" onclick="closeMatchingModal('matchingIndModal')">
+                    Close
+                </button>
+                <button type="button" class="primary-btn" id="modalMatchIndActionBtn">
+                    <i class="ri-handshake-line"></i> Express Interest
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ================= EXPRESS INTEREST & COLLABORATION PROPOSAL MODAL ================= -->
+    <div id="collaborationModal" class="uni-modal-overlay"
+        onclick="handleMatchingModalOverlayClick(event, 'collaborationModal')">
+        <div class="uni-modal-card" role="dialog" aria-modal="true" aria-labelledby="collabModalTitle"
+            style="max-width: 600px;">
+            <div class="uni-modal-header">
+                <div class="uni-modal-badge"
+                    style="background: rgba(16, 185, 129, 0.1); color: #10b981; font-size: 1.8rem;">
+                    🤝
+                </div>
+                <div class="uni-modal-title-group">
+                    <h2 id="collabModalTitle">Initiate Solution Collaboration</h2>
+                    <p class="uni-modal-location">Formalize partnership for societal problem solving</p>
+                </div>
+                <button type="button" class="uni-modal-close-btn" onclick="closeMatchingModal('collaborationModal')">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+
+            <form id="collaborationProposalForm" onsubmit="handleCollaborationSubmit(event)">
+                <div class="uni-modal-body">
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label style="font-weight: 600; font-size: 0.85rem;">Target Societal Problem</label>
+                        <input type="text" id="collabFormProblemTitle" readonly
+                            style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%; color: var(--text-secondary);">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label style="font-weight: 600; font-size: 0.85rem;">Partner Organization</label>
+                        <input type="text" id="collabFormPartnerName" readonly
+                            style="background: var(--bg-primary); border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%; color: var(--text-secondary);">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="collabProjectTitle" style="font-weight: 600; font-size: 0.85rem;">Project Title
+                            *</label>
+                        <input type="text" id="collabProjectTitle" required
+                            placeholder="e.g. Solar IoT Water Purification Pilot"
+                            style="border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%;">
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 14px;">
+                        <label for="collabScopeDesc" style="font-weight: 600; font-size: 0.85rem;">Proposed Scope &
+                            Technology Deployment *</label>
+                        <textarea id="collabScopeDesc" rows="3" required
+                            placeholder="Outline technical contribution, prototyping resources, or CSR funding commitment..."
+                            style="border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%;"></textarea>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;">
+                        <div class="form-group">
+                            <label for="collabTimeline" style="font-weight: 600; font-size: 0.85rem;">Estimated
+                                Timeline</label>
+                            <select id="collabTimeline"
+                                style="border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%;">
+                                <option>1 - 3 Months (Rapid Prototype)</option>
+                                <option selected>3 - 6 Months (Field Pilot)</option>
+                                <option>6 - 12 Months (Full Scale Deployment)</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="collabContactEmail" style="font-weight: 600; font-size: 0.85rem;">Nodal Contact
+                                Email *</label>
+                            <input type="email" id="collabContactEmail" required placeholder="lead@institution.ac.in"
+                                style="border: 1px solid var(--border-color); padding: 8px 12px; border-radius: 8px; width: 100%;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="uni-modal-footer">
+                    <button type="button" class="secondary-btn" onclick="closeMatchingModal('collaborationModal')">
+                        Cancel
+                    </button>
+                    <button type="submit" class="primary-btn">
+                        <i class="ri-check-line"></i> Confirm & Submit Interest
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- EXISTING DUPLICATE REPORT DETAILS MODAL -->
+    <div id="duplicateReportModal" class="uni-modal-overlay" onclick="handleDuplicateModalOverlayClick(event)" style="display: none;">
+        <div class="uni-modal-content" style="max-width: 620px;" onclick="event.stopPropagation()">
+            <div class="uni-modal-header" style="background: linear-gradient(135deg, #004B87, #0076A8); color: white; padding: 18px 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span style="font-size: 1.6rem;">📋</span>
+                        <div>
+                            <h3 id="dupModalHeaderTitle" style="color: white; margin: 0; font-size: 1.15rem;">Existing Community Problem</h3>
+                            <small id="dupModalHeaderSub" style="color: #bfdbfe;">Viewing potential matching report</small>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-close-btn" onclick="closeDuplicateModal()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ri-close-line" style="font-size: 1.2rem;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="uni-modal-body" style="padding: 24px;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; margin-bottom: 16px;">
+                    <div>
+                        <span class="badge high" id="dupModalPriorityBadge">High Priority</span>
+                        <h2 id="dupModalProblemTitle" style="font-size: 1.3rem; margin-top: 6px; color: var(--text-dark);">Drinking Water Shortage &amp; Contamination</h2>
+                        <span id="dupModalProblemId" style="font-size: 0.85rem; color: var(--muted); font-weight: 600;">#SCP-1001</span>
+                    </div>
+                    <div style="text-align: right;">
+                        <span class="status in-progress" id="dupModalStatusTag">In Progress</span>
+                        <div style="margin-top: 6px; font-size: 0.82rem; color: var(--primary); font-weight: 600;">
+                            <i class="ri-thumb-up-fill"></i> <span id="dupModalSupportCount">14</span> Supporters
+                        </div>
+                    </div>
+                </div>
+
+                <div style="background: var(--bg-body, #f8fafc); border-radius: 10px; padding: 14px 18px; margin-bottom: 16px; border: 1px solid var(--border-color, #e2e8f0);">
+                    <h4 style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--muted); margin-bottom: 8px;">Problem Description</h4>
+                    <p id="dupModalProblemDesc" style="color: var(--text-dark); line-height: 1.6; font-size: 0.92rem; margin: 0;">
+                        Villagers in Gumla district face severe drinking water shortage during summer months. Well water contains high levels of iron and bacteria.
+                    </p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; margin-bottom: 16px;">
+                    <div style="background: var(--bg-card, #fff); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color, #e2e8f0);">
+                        <small style="color: var(--muted); display: block;">Category</small>
+                        <strong id="dupModalCategory" style="font-size: 0.85rem; color: var(--text-dark);">Water Management</strong>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color, #e2e8f0);">
+                        <small style="color: var(--muted); display: block;">District / Location</small>
+                        <strong id="dupModalLocation" style="font-size: 0.85rem; color: var(--text-dark);">Gumla, Jharkhand</strong>
+                    </div>
+                    <div style="background: var(--bg-card, #fff); padding: 10px; border-radius: 8px; border: 1px solid var(--border-color, #e2e8f0);">
+                        <small style="color: var(--muted); display: block;">Distance to Draft</small>
+                        <strong id="dupModalDistance" style="font-size: 0.85rem; color: var(--primary);">350 m</strong>
+                    </div>
+                </div>
+
+                <div class="dup-alert-recommendation" style="background: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid #f59e0b; padding: 12px 16px; border-radius: 6px;">
+                    <strong style="color: #b45309; font-size: 0.85rem;"><i class="ri-lightbulb-line"></i> Recommended Action:</strong>
+                    <p style="color: #92400e; font-size: 0.82rem; margin: 4px 0 0 0;">
+                        Supporting this existing complaint elevates its community urgency score for university and industry matching without creating redundant administrative tickets.
+                    </p>
+                </div>
+            </div>
+
+            <div class="uni-modal-footer" style="padding: 16px 24px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color, #e2e8f0);">
+                <button type="button" class="secondary-btn" onclick="closeDuplicateModal()">Close</button>
+                <button type="button" class="primary-btn" onclick="supportCurrentDuplicateReport()" style="background: #10b981; border-color: #10b981;">
+                    <i class="ri-thumb-up-line"></i> Support This Complaint
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- SUSPICIOUS REPORTS REVIEW MODAL -->
+    <div id="suspiciousReportsModal" class="uni-modal-overlay" onclick="closeSuspiciousReviewModal()">
+        <div class="uni-modal-content" style="max-width: 980px; width: 95%;" onclick="event.stopPropagation()">
+            <div class="uni-modal-header" style="background: linear-gradient(135deg, #b91c1c, #dc2626); color: white; padding: 18px 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                            <i class="ri-shield-cross-line"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: white; margin: 0; font-size: 1.15rem; font-weight: 700;">Review Suspicious &amp; Location Mismatch Reports</h3>
+                            <small style="color: #fecaca;">Automated GPS-vs-Reported validation flags complaints where distance exceeds 50km or suspicion threshold</small>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-close-btn" onclick="closeSuspiciousReviewModal()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ri-close-line" style="font-size: 1.2rem;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="uni-modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(239, 68, 68, 0.06); border: 1px solid rgba(239, 68, 68, 0.2); padding: 10px 16px; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #991b1b;">
+                        <i class="ri-alert-fill" style="color: #dc2626;"></i>
+                        <strong>Detection Engine:</strong> Haversine distance threshold is set to <strong>50.0 km</strong>. Reports with GPS discrepancies or elevated fraud risk are shown below.
+                    </div>
+                    <span id="suspiciousReportsModalCountBadge" style="background: #ef4444; color: white; font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 12px;">-- Reports</span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-review-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-body, #f8fafc); border-bottom: 2px solid var(--border-color, #e2e8f0); text-align: left;">
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">ID</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Problem Title</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">District</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Reported Loc</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">GPS Location</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Distance</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Risk / Reason</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Status</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted); text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="suspiciousReportsTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 24px; color: var(--muted);">Loading suspicious reports...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="uni-modal-footer" style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0);">
+                <span style="font-size: 0.8rem; color: var(--muted);">Actions immediately update platform verification records and recalculate dashboard integrity scores.</span>
+                <button type="button" class="secondary-btn" onclick="closeSuspiciousReviewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- DUPLICATE REPORTS REVIEW MODAL -->
+    <div id="duplicateReportsModal" class="uni-modal-overlay" onclick="closeDuplicatesReviewModal()">
+        <div class="uni-modal-content" style="max-width: 980px; width: 95%;" onclick="event.stopPropagation()">
+            <div class="uni-modal-header" style="background: linear-gradient(135deg, #b45309, #d97706); color: white; padding: 18px 24px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 40px; height: 40px; border-radius: 8px; background: rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; font-size: 1.3rem;">
+                            <i class="ri-file-copy-2-line"></i>
+                        </div>
+                        <div>
+                            <h3 style="color: white; margin: 0; font-size: 1.15rem; font-weight: 700;">Review Potential Duplicate Submissions</h3>
+                            <small style="color: #fef3c7;">Multi-signal AI duplicate detection identifies reports matching existing active community complaints</small>
+                        </div>
+                    </div>
+                    <button type="button" class="modal-close-btn" onclick="closeDuplicatesReviewModal()" style="background: rgba(255,255,255,0.2); color: white; border: none; border-radius: 50%; width: 32px; height: 32px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
+                        <i class="ri-close-line" style="font-size: 1.2rem;"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="uni-modal-body" style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; background: rgba(217, 119, 6, 0.08); border: 1px solid rgba(217, 119, 6, 0.2); padding: 10px 16px; border-radius: 8px;">
+                    <div style="font-size: 0.85rem; color: #92400e;">
+                        <i class="ri-radar-fill" style="color: #d97706;"></i>
+                        <strong>Duplicate Shield:</strong> Identifies reports submitted with high semantic and geographic similarity (threshold &ge; 60%). Resolve or support to avoid redundant tickets.
+                    </div>
+                    <span id="duplicateReportsModalCountBadge" style="background: #d97706; color: white; font-weight: 700; font-size: 0.78rem; padding: 3px 10px; border-radius: 12px;">-- Duplicates</span>
+                </div>
+
+                <div style="overflow-x: auto;">
+                    <table class="admin-review-table" style="width: 100%; border-collapse: collapse; font-size: 0.85rem;">
+                        <thead>
+                            <tr style="background: var(--bg-body, #f8fafc); border-bottom: 2px solid var(--border-color, #e2e8f0); text-align: left;">
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">ID</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Problem Title</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Category</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">District</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Submitted</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Similar Report</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Similarity / Reason</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted);">Status</th>
+                                <th style="padding: 10px 12px; font-weight: 600; color: var(--muted); text-align: center;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="duplicateReportsTableBody">
+                            <tr>
+                                <td colspan="9" style="text-align: center; padding: 24px; color: var(--muted);">Loading duplicate reports...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="uni-modal-footer" style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0);">
+                <span style="font-size: 0.8rem; color: var(--muted);">Marking as original clears duplicate flags; boosting existing transfers endorsement to original ticket.</span>
+                <button type="button" class="secondary-btn" onclick="closeDuplicatesReviewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- REPORT ANYWAY CONFIRMATION MODAL -->
+    <div id="modalReportAnywayConfirm" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 10050; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 520px; width: 90%; border-radius: 12px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden;">
+            <div class="uni-modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-file-edit-line" style="color: var(--primary, #2563eb);"></i> Confirm Separate Problem Report
+                </h3>
+                <button type="button" class="close-btn" onclick="closeReportAnywayModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted);">&times;</button>
+            </div>
+            <div style="padding: 20px;">
+                <div style="display: flex; gap: 14px; align-items: flex-start;">
+                    <div style="width: 42px; height: 42px; border-radius: 50%; background: #eff6ff; color: #2563eb; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; flex-shrink: 0;">
+                        <i class="ri-information-line"></i>
+                    </div>
+                    <div>
+                        <p style="margin: 0 0 12px; font-size: 0.95rem; line-height: 1.5; color: var(--text-dark);">
+                            Your report is similar to an existing issue, but you can still submit it if you believe it represents a separate or independently observed problem.
+                        </p>
+                        <div style="background: var(--bg-body, #f8fafc); padding: 10px 14px; border-radius: 8px; border-left: 3px solid #2563eb; font-size: 0.85rem; color: var(--muted);">
+                            A separate report will be created and linked to the community issue cluster so that civic authorities can cross-verify all independent submissions.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-modal-footer" style="padding: 14px 20px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid var(--border-color, #e2e8f0);">
+                <button type="button" class="secondary-btn" id="btnCancelReportAnyway" onclick="closeReportAnywayModal()">
+                    CANCEL
+                </button>
+                <button type="button" class="primary-btn" id="btnConfirmReportAnyway" onclick="confirmSubmitReportAnyway()" style="background: #2563eb; color: white;">
+                    <i class="ri-send-plane-line"></i> SUBMIT ANYWAY
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- VIEW EXISTING REPORT DETAILS MODAL -->
+    <div id="modalViewExistingProblem" class="modal-overlay" style="display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.65); backdrop-filter: blur(4px); z-index: 10050; align-items: center; justify-content: center;">
+        <div class="modal-content" style="max-width: 650px; width: 92%; border-radius: 12px; background: var(--bg-card, #ffffff); border: 1px solid var(--border-color, #e2e8f0); box-shadow: 0 20px 25px -5px rgba(0,0,0,0.2); overflow: hidden;">
+            <div class="uni-modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--border-color, #e2e8f0); display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin: 0; font-size: 1.15rem; color: var(--text-dark); display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-eye-line" style="color: #2563eb;"></i> Existing Report Details
+                </h3>
+                <button type="button" class="close-btn" onclick="closeViewExistingModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--muted);">&times;</button>
+            </div>
+            <div style="padding: 20px; max-height: 70vh; overflow-y: auto;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <span id="modalDupReportId" style="font-size: 1.15rem; font-weight: 700; color: var(--primary, #2563eb);">#REP-1024</span>
+                    <span class="status-pill status-pill-warning" id="modalDupStatusPill" style="font-weight: 600;">Status: Pending</span>
+                </div>
+                <h4 id="modalDupTitle" style="margin: 0 0 10px; font-size: 1.05rem; color: var(--text-dark);">Water supply problem in Ward 12</h4>
+                <p id="modalDupDesc" style="font-size: 0.9rem; color: var(--muted); line-height: 1.5; margin: 0 0 16px;">Description of the problem...</p>
+
+                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; background: var(--bg-body, #f8fafc); padding: 14px; border-radius: 8px; margin-bottom: 16px;">
+                    <div><small style="color: var(--muted); display: block;">Category:</small><strong id="modalDupCategory" style="color: var(--text-dark);">Water Management</strong></div>
+                    <div><small style="color: var(--muted); display: block;">District / Locality:</small><strong id="modalDupLocation" style="color: var(--text-dark);">Ranchi</strong></div>
+                    <div><small style="color: var(--muted); display: block;">Distance from you:</small><strong id="modalDupDistance" style="color: var(--text-dark);">250 meters</strong></div>
+                    <div><small style="color: var(--muted); display: block;">Community Supporters:</small><strong id="modalDupSupportCount" style="color: #16a34a;">1 citizen</strong></div>
+                    <div><small style="color: var(--muted); display: block;">Reported Date:</small><strong id="modalDupDate" style="color: var(--text-dark);">Recent</strong></div>
+                    <div><small style="color: var(--muted); display: block;">Issue Cluster:</small><strong id="modalDupCluster" style="color: #2563eb;">CLUSTER-1024</strong></div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color, #e2e8f0); padding-top: 14px;">
+                    <small style="color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 6px;">Similarity Signals Breakdown</small>
+                    <div id="modalDupSignals" style="display: flex; flex-wrap: wrap; gap: 8px;">
+                        <span class="reason-chip">Text: 88%</span>
+                        <span class="reason-chip">Location: 100%</span>
+                        <span class="reason-chip">Category: 100%</span>
+                        <span class="reason-chip">Area: 70%</span>
+                    </div>
+                </div>
+            </div>
+            <div class="uni-modal-footer" style="padding: 14px 20px; display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-color, #e2e8f0);">
+                <button type="button" class="dup-btn support-btn" onclick="supportFromViewModal()" style="margin: 0; padding: 8px 16px; font-weight: 600; font-size: 0.9rem;">
+                    <i class="ri-thumb-up-line"></i> Support This Report Instead
+                </button>
+                <button type="button" class="secondary-btn" onclick="closeViewExistingModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+
+    <div id="toast" class="toast">
+        <i class="ri-checkbox-circle-line"></i>
+        <span id="toastMessage">
+            Success!
+        </span>
+    </div>
+
+
+    <script src="my1.js"></script>
+
+</body>
+</html>
